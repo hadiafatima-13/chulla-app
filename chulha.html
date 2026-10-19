@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#140D0A"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Chulha">
+<title>Chulha — MaaSaathi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500&family=Rubik:wght@400;500;600&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#140D0A;--fg:#F5E8D8;--muted:#A88D75;--acc:#F0913C;--card:rgba(48, 28, 20, 0.82);--line:rgba(245,232,216,.14);
+--r:14px;--glyphbg:rgba(240,145,60,.16);--tagbg:rgba(140,60,40,.3);--tagfg:#F0B48C;--btn:rgba(240,145,60,.16);--btnfg:#FFBC78;
+--pillon:rgba(240,145,60,.18);--input:rgba(10,6,4,.6);--nani:rgba(180,70,50,.18);--alert:rgba(200,70,55,.2);
+--alertline:rgba(200,70,55,.5);--col:620px;--serif:'Alegreya',Georgia,serif;--sans:'Rubik',system-ui,sans-serif}
+#onb{background:radial-gradient(70% 60% at 50% 70%,rgba(20,13,10,.5),rgba(20,13,10,.94))}
+nav#nav{top:54px;left:50%;transform:translateX(-50%);background:rgba(30,18,13,.78);border:1px solid var(--line);border-radius:16px;padding:5px;backdrop-filter:blur(14px)}
+#nav .lbl{font-size:10px}
+#nav button[aria-current="true"]{background:rgba(240,145,60,.14)}
+#panel{left:0;right:0;bottom:0;height:62svh;background:linear-gradient(180deg,rgba(32,20,14,.8),rgba(16,10,7,.97));border-top:1px solid var(--line);border-radius:24px 24px 0 0;padding:18px 22px 0;backdrop-filter:blur(18px)}
+#panel::before{content:"";display:block;width:42px;height:4px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+#body{padding:10px 0 30px}
+@media(min-width:901px){#panel{left:auto;right:22px;top:104px;bottom:22px;height:auto;width:min(430px,40vw);border-radius:24px;border:1px solid var(--line)}}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+canvas#world{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+button,input,select{font-family:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#boot{position:fixed;inset:0;z-index:90;background:var(--bg);display:grid;place-items:center;transition:opacity .7s}
+#boot.gone{opacity:0;pointer-events:none}
+#boot h1{font-family:var(--serif);font-weight:400;font-size:26px;margin:0}
+#boot p{color:var(--muted);font-size:13px;margin:6px 0 0}
+#onb{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;overflow-y:auto;transition:opacity .5s}
+#onb.gone{opacity:0;pointer-events:none}
+.obar{height:3px;background:var(--line);flex:none}
+.obar i{display:block;height:100%;width:16%;background:var(--acc);transition:width .5s cubic-bezier(.22,.9,.3,1)}
+.steps{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:34px 20px 70px}
+.step{width:100%;max-width:var(--col);animation:up .45s cubic-bezier(.22,.9,.3,1)}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.oe{font-size:12px;color:var(--acc);margin:0 0 8px}
+.step h1{font-family:var(--serif);font-weight:400;font-size:clamp(25px,4.6vw,36px);line-height:1.15;margin:0 0 8px}
+.big2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,4vw,30px);margin:0 0 4px}
+.lede{color:var(--muted);font-size:14px;margin:0 0 16px;max-width:64ch}
+.bignum{text-align:center;margin:12px 0 4px}
+.bignum b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(48px,11vw,80px);line-height:1;color:var(--acc)}
+.bignum span{color:var(--muted);font-size:13px}
+input[type=range]{width:100%;accent-color:var(--acc);margin:10px 0}
+.stagenow{text-align:center;font-family:var(--serif);font-size:17px;margin:2px 0 14px;min-height:24px}
+.stlab{color:var(--acc);font-size:12.5px;display:block;margin-bottom:8px}
+#app{position:fixed;inset:0;z-index:20;display:none}
+#app.on{display:block}
+header{position:fixed;top:0;left:0;right:0;z-index:31;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;pointer-events:none}
+.brand{pointer-events:auto;display:flex;align-items:baseline;gap:8px}
+.brand b{font-family:var(--serif);font-weight:400;font-size:18px}
+.brand i{font-style:normal;font-size:11px;color:var(--muted)}
+.tools{display:flex;gap:6px;pointer-events:auto}
+.chip{background:var(--card);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;backdrop-filter:blur(12px)}
+.chip[aria-pressed="true"]{border-color:var(--acc);color:var(--acc)}
+nav#nav{position:fixed;z-index:30;display:flex;gap:3px}
+#nav button{background:transparent;border:0;color:var(--muted);cursor:pointer;display:grid;place-items:center;gap:2px;padding:9px 11px;border-radius:14px;font-size:11px}
+#nav button .ico{font-size:16px;line-height:1}
+#nav button[aria-current="true"]{color:var(--acc)}
+#panel{position:fixed;z-index:25;display:flex;flex-direction:column}
+#pe{font-size:11.5px;color:var(--acc);margin:0 0 3px}
+#pt{font-family:var(--serif);font-weight:400;font-size:24px;margin:0 0 4px;line-height:1.18}
+#pl{color:var(--muted);font-size:12.8px;margin:0;max-width:54ch}
+#body{flex:1;overflow-y:auto;scrollbar-width:thin}
+#body::-webkit-scrollbar{width:6px}
+#body::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+h3.sec{font-family:var(--serif);font-weight:400;font-size:17px;margin:20px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;margin-bottom:9px}
+.card.flat{background:transparent;border-style:dashed}
+.card b{display:block;font-size:14.5px;margin-bottom:4px}
+.card p{margin:0 0 4px;color:var(--muted);font-size:13px}
+.card .src{color:var(--acc);font-size:12px}
+.meal{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:start;background:var(--card);border:1px solid var(--line);color:var(--fg);border-radius:var(--r);padding:12px 13px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.meal:hover{border-color:var(--acc)}
+.glyph{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:18px;background:var(--glyphbg)}
+.mbody{flex:1;display:block}
+.slot{display:block;font-size:11px;color:var(--acc)}
+.mt{display:block;font-size:15px;font-weight:600}
+.mu{display:block;font-size:11.5px;color:var(--muted);opacity:.7;margin-bottom:3px}
+.mw{display:block;font-size:12.5px;color:var(--muted)}
+.pick{display:block;font-size:11.5px;color:var(--acc);margin-top:5px}
+.tagrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tag{font-size:10.5px;padding:3px 8px;border-radius:999px;background:var(--tagbg);color:var(--tagfg);border:1px solid var(--line)}
+.tag.cost{background:transparent;color:var(--acc)}
+.btn{background:var(--btn);border:1px solid var(--acc);color:var(--btnfg);border-radius:var(--r);padding:11px 16px;font-size:14px;cursor:pointer}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--muted)}
+.btn.big{flex:1;min-width:60%;margin-top:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.row.nowrap{flex-wrap:nowrap}
+.link{background:none;border:0;color:var(--acc);font-size:12.5px;cursor:pointer;padding:6px 0}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.pill{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:7px 12px;font-size:12.5px;cursor:pointer}
+.pill:hover{color:var(--fg);border-color:var(--acc)}
+.pill[aria-pressed="true"]{background:var(--pillon);border-color:var(--acc);color:var(--acc)}
+.pill[disabled]{opacity:.4;cursor:default}
+label.fld{display:block;margin-bottom:14px}
+label.fld>span{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px}
+input[type=text],input[type=number],input[type=date],select{width:100%;background:var(--input);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;color:var(--fg);font-size:14px}
+select{max-width:130px}
+input::placeholder{color:var(--muted);opacity:.6}
+.mic{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--acc);background:var(--btn);color:var(--acc);font-size:17px;cursor:pointer}
+.mic.live{animation:m 1.1s infinite}
+@keyframes m{50%{box-shadow:0 0 0 9px var(--pillon)}}
+.tabs{display:flex;gap:3px;background:var(--input);padding:4px;border-radius:var(--r);margin-bottom:14px;overflow-x:auto}
+.tabs button{flex:none;border:0;background:transparent;color:var(--muted);padding:8px 11px;border-radius:calc(var(--r) - 3px);font-size:12.3px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--pillon);color:var(--acc)}
+.pane{display:none}.pane.on{display:block}
+.note{border-inline-start:2px solid var(--acc);padding-inline-start:12px;margin:14px 0;font-size:12.8px;color:var(--muted)}
+.nani{display:flex;gap:10px;background:var(--nani);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;margin:12px 0}
+.nani .av{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:16px;background:var(--glyphbg)}
+.nani p{margin:0;font-size:13px}
+.nani b{display:block;font-family:var(--serif);font-weight:400;color:var(--acc);margin-bottom:3px}
+.kid{display:flex;align-items:center;gap:10px;background:var(--input);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;margin-bottom:7px;font-size:13.2px}
+.kid .kico{font-size:17px}
+.kid .muted{color:var(--muted);font-size:12px}
+.kid button{margin-inline-start:auto;background:none;border:0;color:var(--muted);cursor:pointer;font-size:15px}
+.bar{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:12.5px}
+.bar span{width:38%;color:var(--muted)}
+.bar i{flex:1;height:8px;border-radius:5px;background:var(--acc);min-width:2px;display:block;transition:width .5s}
+.bar em{font-style:normal;color:var(--muted);width:20px;text-align:end}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.learn{text-align:start;background:var(--card);border:1px solid var(--line);color:var(--fg);border-radius:var(--r);padding:12px;cursor:pointer}
+.learn .ic{font-size:18px}
+.learn .lt{display:block;font-size:13.8px;font-weight:600;margin:5px 0 2px}
+.learn .ls{display:block;font-size:11.5px;color:var(--muted)}
+.learn .lb{display:none}
+.learn[aria-expanded="true"]{grid-column:1/-1;border-color:var(--acc)}
+.learn[aria-expanded="true"] .lb{display:block}
+.learn ul{margin:8px 0 0;padding-inline-start:16px;font-size:12.5px;color:var(--muted)}
+.learn li{margin-bottom:5px}
+.learn.alert{background:var(--alert);border-color:var(--alertline)}
+.fmap{margin:0;padding-inline-start:20px;font-size:12.5px;color:var(--muted)}
+.fmap li{margin-bottom:5px}
+.fmap b{color:var(--fg);font-weight:600}
+.fmap span{display:block;font-size:11.5px;color:var(--acc)}
+.bub{border-radius:var(--r);padding:11px 13px;margin-bottom:8px;font-size:13.2px;max-width:92%}
+.bub.me{background:var(--pillon);margin-inline-start:auto}
+.bub.her{background:var(--card);border:1px solid var(--line)}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:16px;text-align:center;color:var(--muted);font-size:13px;margin:10px 0}
+.safety{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:20px;padding-top:10px}
+.prio p{margin:3px 0}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+#boot .bmsg{margin-top:10px;font-size:12px;color:var(--muted);max-width:280px;line-height:1.5}
+#bootRetry{display:none;margin-top:16px;background:var(--btn);border:1px solid var(--acc);color:var(--btnfg);
+ border-radius:10px;padding:9px 18px;font-size:13px;cursor:pointer}
+#bootDots{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc);
+ margin-inline-start:2px;animation:bd 1.2s infinite}
+@keyframes bd{0%,100%{opacity:.25}50%{opacity:1}}
+
+body[dir="rtl"]{font-family:'Noto Nastaliq Urdu',var(--sans);line-height:2}
+body[dir="rtl"] #pt,body[dir="rtl"] .step h1,body[dir="rtl"] h3.sec{font-family:'Noto Nastaliq Urdu',var(--serif)}
+</style></head>
+<body>
+<canvas id="world"></canvas>
+<div id="boot"><div style="text-align:center">
+  <h1>Chulha</h1>
+  <p id="bootstatus">Lighting the fire<span id="bootDots"></span></p>
+  <p class="bmsg" id="bootmsg">If this screen does not change within a few seconds, something is blocking a required file.</p>
+  <button id="bootRetry">Try again</button>
+</div></div>
+<div id="onb"></div>
+<div id="app">
+  <header><div class="brand"><b>Chulha</b><i>the hearth at home</i></div>
+    <div class="tools"><button class="chip" id="lbtn">اردو</button>
+    <button class="chip" id="qbtn" data-act="quality">Sharp detail</button></div></header>
+  <nav id="nav"></nav>
+  <main id="panel"><div class="phead"><p id="pe"></p><h2 id="pt"></h2><p id="pl"></p></div><div id="body"></div></main>
+</div>
+
+<script>
+/* Boot watchdog: never fail silently. Does not alter scoping of later scripts. */
+window.__loadOK=false;
+document.getElementById('bootRetry').onclick=function(){location.reload();};
+window.addEventListener('error',function(e){
+  if(window.__loadOK)return;
+  var el=document.getElementById('bootstatus'),dm=document.getElementById('bootDots'),mm=document.getElementById('bootmsg');
+  if(el)el.textContent='Something failed to load.';
+  if(dm)dm.style.display='none';
+  if(mm)mm.textContent='('+(e.message||'a required file did not load')+') Check your internet connection and tap Try again below.';
+  document.getElementById('bootRetry').style.display='inline-block';
+});
+setTimeout(function(){
+  if(window.__loadOK)return;
+  var el=document.getElementById('bootstatus'),mm=document.getElementById('bootmsg');
+  if(el)el.textContent='Still waiting…';
+  if(mm)mm.textContent='This usually means the 3D library (from cdnjs.cloudflare.com) has not finished loading. Try switching networks (mobile data instead of Wi-Fi, or turn off a VPN) and tap Try again.';
+  document.getElementById('bootRetry').style.display='inline-block';
+},7000);
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+  onerror="document.getElementById('bootstatus').textContent='The 3D library could not load.';document.getElementById('bootDots').style.display='none';document.getElementById('bootmsg').textContent='cdnjs.cloudflare.com may be blocked on this network. Try switching networks or a VPN, then tap Try again.';document.getElementById('bootRetry').style.display='inline-block';"></script>
+<script>const APP={key:"ms3.chulha",name:"Chulha"};</script>
+<script>
+/* =========================================================================
+   MaaSaathi core v2
+   Implements the 25 features of the specification, in the order given.
+   Onboarding 1-4 + 7, then Today / Meals / My Family / Learn / Ask.
+   ========================================================================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- bilingual interface labels (feature 25) ---------- */
+const T_={
+ nav:[["Today","آج"],["Meals","کھانے"],["My Family","میرا گھرانہ"],["Learn","سیکھیں"],["Ask","پوچھیں"]],
+ next:["Continue","آگے بڑھیں"],back:["Back","واپس"],save:["Save","محفوظ کریں"],
+ breakfast:["Breakfast","ناشتہ"],lunch:["Lunch","دوپہر"],snack:["Snack","ہلکا کھانا"],dinner:["Dinner","رات"],
+ cheap:["Very cheap","بہت سستا"],mid:["Medium","درمیانہ"],high:["Higher","زیادہ"],
+ read:["Read aloud","بلند آواز میں سنیں"],
+ safety:["General guidance only. For bleeding, severe pain, high fever, a baby who will not feed, or anything that worries you — see your doctor or Lady Health Worker today.",
+         "یہ عام رہنمائی ہے۔ خون آنا، شدید درد، تیز بخار، بچہ دودھ نہ پیے، یا کوئی بھی پریشانی ہو تو آج ہی ڈاکٹر یا لیڈی ہیلتھ ورکر سے رجوع کریں۔"]
+};
+function T(k){return T_[k]?T_[k][S.lang==="ur"?1:0]:k;}
+function B(en,ur){return S.lang==="ur"?ur:en;}
+
+/* ---------- nutrients ---------- */
+const NUTS={
+ iron:["Iron","فولاد","Carries oxygen to the baby and keeps you from feeling weak and breathless.","daal, palak, gur, chana, meat"],
+ folate:["Folate","فولک ایسڈ","Builds the baby's brain and spine — needed most in the first weeks.","green leaves, daal, chana, citrus"],
+ protein:["Protein","پروٹین","The material every new cell is made from.","egg, daal, chana, dahi, meat"],
+ calcium:["Calcium","کیلشیم","Bones and teeth. If it runs short the baby takes it from yours.","dahi, milk, til, small fish"],
+ omega:["Omega-3 fats","اومیگا تھری","The fat the growing brain is literally built out of.","fish, walnut, egg, flaxseed"],
+ choline:["Choline","کولین","Wires memory and learning in the growing brain.","egg yolk, milk, chana"],
+ iodine:["Iodine","آیوڈین","Brain development and thyroid for both of you.","iodised salt, fish, milk"],
+ vitA:["Vitamin A","وٹامن اے","Eyes, skin, and fighting off infection.","gajar, kaddu, palak, milk"],
+ fibre:["Fibre","ریشہ","Keeps constipation away, which most mothers face.","chana, whole daal, sabzi, fruit"],
+ energy:["Energy","توانائی","Enough calories so protein is used for building, not burnt as fuel.","roti, rice, gur, ghee, banana"],
+ zinc:["Zinc","زنک","Healing, growth, and shorter illnesses.","meat, daal, chana, til"],
+ fluids:["Fluids","پانی","Blood volume, milk supply, and steady energy.","water, lassi, soup, milk"]
+};
+const GROUPS={grain:["Grains","اناج"],pulse:["Pulses","دالیں"],veg:["Vegetables & fruit","سبزی پھل"],
+ animal:["Egg, milk or meat","انڈا، دودھ، گوشت"],fat:["Fats","چکنائی"]};
+
+/* ---------- recipes ---------- */
+const REC=[
+ {id:"dc",em:"🍛",en:"Masoor daal with rice",ur:"مسور دال چاول",slot:["lunch","dinner"],cost:1,effort:2,mins:35,veg:1,batch:1,
+  keys:["daal","lentil","masoor","rice","chawal","onion","tomato"],nut:["iron","protein","folate"],grp:["grain","pulse"],
+  buy:["masoor daal 250g","rice 500g","onion 2","tomato 2","lemon 1"],
+  why:"Cheap iron and protein. Squeeze lemon on top so your body takes the iron in.",
+  mother:"Take a full bowl of daal, not just rice.",baby:"6m+: mash thick daal with soft rice. No chilli, no salt.",child:"Mix the daal through the rice so none is left."},
+ {id:"pa",em:"🥬",en:"Palak aloo with roti",ur:"پالک آلو روٹی",slot:["lunch","dinner"],cost:1,effort:2,mins:25,veg:1,
+  keys:["palak","spinach","saag","aloo","potato","onion","roti","atta"],nut:["folate","iron","vitA"],grp:["veg","grain"],
+  buy:["palak 1 bunch","aloo 500g","onion 2","atta 1kg"],
+  why:"Green leaves carry folate and iron — the two that matter earliest.",
+  mother:"Keep tea an hour away from this meal; tea blocks iron.",baby:"8m+: finely chopped, well cooked, mashed with a little ghee.",child:"Roll it inside a roti — greens disappear that way."},
+ {id:"ab",em:"🍳",en:"Anda bhurji with roti",ur:"انڈا بھرجی روٹی",slot:["breakfast","dinner"],cost:1,effort:1,mins:10,egg:1,quick:1,
+  keys:["anda","egg","onion","tomato","roti"],nut:["protein","choline"],grp:["animal","grain"],
+  buy:["eggs 6","onion 2","tomato 2","atta 1kg"],
+  why:"A fully cooked egg is the cheapest complete protein, and the yolk carries choline for the brain.",
+  mother:"Cook until nothing runs. Soft eggs are not safe in pregnancy.",baby:"6m+: a small piece of well-cooked egg, mashed.",child:"One egg in the morning holds them until lunch."},
+ {id:"ep",em:"🍳",en:"Anda palak bhujia",ur:"انڈا پالک بھجیا",slot:["breakfast","dinner"],cost:1,effort:1,mins:15,egg:1,quick:1,
+  keys:["anda","egg","palak","spinach","onion"],nut:["choline","folate","iron"],grp:["animal","veg"],
+  buy:["eggs 6","palak 1 bunch","onion 2"],
+  why:"Egg and green leaves in one pan — choline, folate and iron together.",
+  mother:"The best ten-minute plate in the brain-building weeks.",baby:"8m+: mash a spoonful, no chilli.",child:"Serve inside roti with a little lemon."},
+ {id:"kh",em:"🥣",en:"Soft khichri",ur:"نرم کھچڑی",slot:["lunch","dinner"],cost:1,effort:1,mins:30,veg:1,quick:1,batch:1,
+  keys:["rice","chawal","daal","moong","ghee"],nut:["energy","protein"],grp:["grain","pulse","fat"],
+  buy:["rice 500g","moong daal 250g","ghee 100g"],
+  why:"One pot, soft and gentle — for the days you feel weak or unwell.",
+  mother:"Add a spoon of ghee and dahi on the side.",baby:"6m+: the softest first food. Mash well.",child:"Serve with dahi and a boiled egg if you have one."},
+ {id:"cc",em:"🥗",en:"Chana chaat",ur:"چنا چاٹ",slot:["snack","lunch"],cost:1,effort:1,mins:12,veg:1,quick:1,nocook:1,
+  keys:["chana","chickpea","chole","onion","tomato","lemon"],nut:["fibre","iron","protein"],grp:["pulse","veg"],
+  buy:["kabuli chana 250g","onion 1","tomato 2","lemon 2"],
+  why:"Protein, iron and fibre with no fresh cooking at all.",
+  mother:"Good when constipation is troubling you. Drink water with it.",baby:"10m+: mash a few soft chanay, no masala.",child:"A cheap after-school plate instead of biscuits."},
+ {id:"dr",em:"🥛",en:"Dahi with roti and gur",ur:"دہی، روٹی اور گڑ",slot:["breakfast","snack"],cost:1,effort:1,mins:5,dairy:1,quick:1,nocook:1,
+  keys:["dahi","yogurt","roti","doodh","milk","gur"],nut:["calcium","iron"],grp:["animal","grain"],
+  buy:["dahi 500g","gur 250g","atta 1kg"],
+  why:"Calcium for bones, and a little iron from the gur.",
+  mother:"A good breakfast on a nauseous morning — cool, plain, no cooking smell.",baby:"6m+: plain dahi. No sugar before one year.",child:"Gur instead of toffee: same sweetness, more iron."},
+ {id:"vp",em:"🍚",en:"Vegetable pulao",ur:"سبزی پلاؤ",slot:["lunch","dinner"],cost:2,effort:2,mins:40,veg:1,batch:1,
+  keys:["rice","chawal","gajar","carrot","matar","peas","aloo"],nut:["energy","vitA"],grp:["grain","veg"],
+  buy:["rice 750g","gajar 250g","matar 250g","aloo 250g","oil 250ml"],
+  why:"One pot feeds everyone, and the vegetables go in without an argument.",
+  mother:"Add boiled chana or an egg so it is not only rice.",baby:"8m+: lift out plain soft rice and veg before the chilli goes in.",child:"Let them pick out the carrots themselves."},
+ {id:"ya",em:"🍲",en:"Chicken or bone yakhni with rice",ur:"یخنی چاول",slot:["lunch","dinner"],cost:2,effort:2,mins:45,batch:1,
+  keys:["gosht","meat","chicken","murghi","yakhni","bone","aloo"],nut:["protein","iron","zinc"],grp:["animal","grain"],
+  buy:["chicken 1kg or bones 1kg","rice 750g","onion 3","ginger garlic 100g"],
+  why:"When there is money for meat, the broth carries protein through the whole family.",
+  mother:"Cook right through to the middle. Keep the broth — it is the cheap part.",baby:"8m+: soft shredded chicken or broth mixed into rice.",child:"Broth over rice fills a child who refuses plain meat."},
+ {id:"bc",em:"🫓",en:"Besan cheela",ur:"بیسن کا چیلا",slot:["breakfast","snack"],cost:1,effort:1,mins:12,veg:1,quick:1,
+  keys:["besan","gram flour","onion","atta"],nut:["protein","fibre"],grp:["pulse","grain"],
+  buy:["besan 500g","onion 2","oil 250ml"],
+  why:"Gram flour turns a plain breakfast into a protein one for a few rupees.",
+  mother:"Two cheelay with dahi will hold you until lunch.",baby:"9m+: a soft finger-sized strip to hold and chew.",child:"Folds flat into a lunchbox and stays soft."},
+ {id:"sd",em:"🌰",en:"Dates, peanuts and gur",ur:"کھجور، مونگ پھلی، گڑ",slot:["snack"],cost:1,effort:1,mins:2,veg:1,quick:1,nocook:1,
+  keys:["khajoor","dates","moongphali","peanut","gur","chana"],nut:["iron","energy"],grp:["veg","fat"],
+  buy:["khajoor 250g","moongphali 250g","gur 250g"],
+  why:"A handful gives iron and energy with no cooking and no fuel.",
+  mother:"Keep a small katori near you for the gap before dinner.",baby:"Not under 2 — whole nuts choke. Use peanut paste in food instead.",child:"Better than chips, and cheaper by weight."},
+ {id:"nd",em:"🥜",en:"Akhrot and milk",ur:"اخروٹ اور دودھ",slot:["snack","breakfast"],cost:2,effort:1,mins:3,dairy:1,quick:1,nocook:1,
+  keys:["akhrot","walnut","doodh","milk","badam","almond"],nut:["omega","calcium","energy"],grp:["animal","fat"],
+  buy:["akhrot 250g","milk 1L"],
+  why:"Walnut is the cheapest local source of the fats a growing brain needs.",
+  mother:"Two or three walnuts a day is enough — this is not a food to buy by the kilo.",baby:"Crushed to a powder into food after 1 year, never whole.",child:"Crush over sooji or dahi so it gets eaten."},
+ {id:"sr",em:"🥧",en:"Sooji with milk and gur",ur:"سوجی، دودھ اور گڑ",slot:["breakfast","snack"],cost:1,effort:1,mins:15,veg:1,dairy:1,quick:1,
+  keys:["sooji","semolina","doodh","milk","ghee","gur"],nut:["energy","calcium"],grp:["grain","animal"],
+  buy:["sooji 500g","milk 1L","gur 250g","ghee 100g"],
+  why:"Warm, soft and filling — for a child who is losing weight or refusing food.",
+  mother:"Make it with milk rather than water so it gives calcium too.",baby:"6m+: thin it with the milk you already give.",child:"A warm evening bowl for a fussy eater."},
+ {id:"fs",em:"🐟",en:"Simple fish salan",ur:"سادہ مچھلی سالن",slot:["lunch","dinner"],cost:2,effort:2,mins:35,
+  keys:["machli","fish","onion","tomato"],nut:["omega","protein","iodine"],grp:["animal","veg"],
+  buy:["small local fish 750g","onion 2","tomato 3","haldi 50g"],
+  why:"Fish carries the omega-3 fats and iodine the baby's brain is built from.",
+  mother:"Cook it fully. Avoid raw or dried salted fish now.",baby:"9m+: check every bone twice, then mash a spoon into rice.",child:"Serve with rice and lemon."},
+ {id:"lb",em:"🍠",en:"Seasonal sabzi with roti",ur:"موسمی سبزی روٹی",slot:["lunch","dinner"],cost:1,effort:1,mins:25,veg:1,quick:1,
+  keys:["lauki","kaddu","turai","bhindi","okra","sabzi","gajar"],nut:["vitA","fibre"],grp:["veg","grain"],
+  buy:["seasonal sabzi 1kg","onion 2","atta 1kg","oil 250ml"],
+  why:"Whatever is cheapest in the market this week is usually the freshest too.",
+  mother:"Add a boiled egg or dahi beside it to make it a full meal.",baby:"7m+: cook soft, mash without chilli.",child:"Small pieces mixed into roti bites."},
+ {id:"bm",em:"🍌",en:"Banana and milk",ur:"کیلا اور دودھ",slot:["snack","breakfast"],cost:1,effort:1,mins:3,veg:1,dairy:1,quick:1,nocook:1,
+  keys:["kela","banana","doodh","milk"],nut:["energy","calcium","fluids"],grp:["veg","animal"],
+  buy:["bananas 6","milk 1L"],
+  why:"Energy, potassium and calcium in one glass, with nothing to cook.",
+  mother:"For the days you cannot stand the smell of cooking.",baby:"6m+: mashed banana alone. Cow milk as a drink only after one year.",child:"Send it on a morning with no time."},
+ {id:"dl",em:"🍚",en:"Doodh dalia",ur:"دودھ دلیہ",slot:["breakfast"],cost:1,effort:1,mins:20,veg:1,dairy:1,
+  keys:["dalia","porridge","wheat","doodh","milk","gur"],nut:["energy","fibre","calcium"],grp:["grain","animal"],
+  buy:["dalia 500g","milk 1L","gur 250g"],
+  why:"Slow energy that lasts the whole morning, and it eases constipation.",
+  mother:"Add a spoon of crushed walnut or til if you have it.",baby:"7m+: cook soft and mash any lumps.",child:"Sweeten with gur, not sugar."}
+];
+
+/* ---------- feature 3: stage-by-stage development ---------- */
+const P_ST=[
+ {to:8,t:"The spine and brain are taking shape",ut:"ریڑھ کی ہڈی اور دماغ بن رہا ہے",dev:"In these first weeks the neural tube — the beginning of the brain and spine — closes. It is the most delicate moment of the whole pregnancy, and it is happening now.",nut:["folate","protein","fluids"],eat:["pa","dc","ab"],care:"Take folic acid daily, cook eggs and meat right through, and avoid unboiled milk."},
+ {to:12,t:"Organs and the first bones",ut:"اعضاء اور پہلی ہڈیاں",dev:"The heart, kidneys and liver are forming and the first bone begins to harden. Nausea is usually at its worst here, so small amounts often beat one big plate.",nut:["protein","calcium","iodine"],eat:["dr","ab","kh"],care:"If you cannot keep any liquid down for a full day, see a doctor."},
+ {to:16,t:"Skeleton and muscle",ut:"ڈھانچہ اور پٹھے",dev:"The skeleton is stiffening and muscle is laying down. Your appetite usually returns around now — use it well.",nut:["calcium","protein","vitA"],eat:["dr","sr","lb"],care:"Use iodised salt. Iodine shortage in these months affects brain growth."},
+ {to:20,t:"Hearing and the senses switch on",ut:"سماعت اور حواس",dev:"Ears, eyes and skin are becoming sensitive. Your blood volume is rising fast, which is why iron demand climbs steeply from here.",nut:["iron","iodine","vitA"],eat:["pa","fs","lb"],care:"Ask for a haemoglobin test if you feel breathless or dizzy on stairs."},
+ {to:24,t:"The brain starts building fast",ut:"دماغ تیزی سے بننے لگا",dev:"Brain cells are multiplying and the lungs are branching. From now until birth the brain takes a bigger share of everything you eat than any other organ.",nut:["omega","choline","iron"],eat:["fs","ep","dc"],care:"Cook fish fully; avoid raw and dried salted fish."},
+ {to:28,t:"Brain growth is at its fastest",ut:"دماغی نشوونما عروج پر",dev:"This is the peak. The brain is folding and laying down connections, and pulling in fat to build them — most of that fat comes from what is on your plate this month.",nut:["omega","choline","iron"],eat:["fs","nd","ep"],care:"Two or three walnuts, an egg a day, fish when you can afford it. Watch for swelling of face or hands."},
+ {to:32,t:"Bones harden, the brain keeps folding",ut:"ہڈیاں مضبوط ہو رہی ہیں",dev:"Calcium moves across to the baby in large amounts now. If your food is short of it, your own bones and teeth pay for it.",nut:["calcium","iron","protein"],eat:["dr","ya","dc"],care:"Count the baby's movements daily. Fewer movements than usual means go today."},
+ {to:36,t:"The baby is putting on weight",ut:"بچے کا وزن بڑھ رہا ہے",dev:"Fat is being stored under the skin for warmth and energy after birth. Your stomach has less room, so smaller plates more often work better.",nut:["energy","protein","iron"],eat:["sr","ya","sd"],care:"Heartburn is common now — eat earlier in the evening and sit up afterwards."},
+ {to:44,t:"Stores for birth and the first milk",ut:"پیدائش اور پہلے دودھ کی تیاری",dev:"The baby is stocking iron to last its first six months, and your body is already making the first milk. Both draw straight from your own reserves.",nut:["iron","energy","fluids"],eat:["dc","sd","bm"],care:"Keep fluids up. Bleeding, severe headache or reduced movement means go to hospital now."}
+];
+const C_ST=[
+ {to:6,t:"Only mother's milk",ut:"صرف ماں کا دودھ",dev:"For the first six months breast milk is complete food — no water, no ghutti, no tea. What matters most is what the mother eats and drinks, because the milk is made from it.",nut:["protein","calcium","fluids"],eat:["dc","dr","sd"],care:"Six or more wet nappies a day usually means enough milk is coming."},
+ {to:9,t:"First thick mashes",ut:"پہلی گاڑھی غذا",dev:"At six months the iron a baby was born with runs out, so food has to start carrying iron. Thick mash, not watery soup: a runny mix fills the stomach without feeding the child.",nut:["iron","energy","protein"],eat:["kh","dc","dr"],care:"No salt, sugar, chilli or honey before one year. One new food at a time."},
+ {to:12,t:"Learning to chew",ut:"چبانا سیکھنا",dev:"The baby can hold soft strips and chew. Brain growth is still extremely fast, so fats and iron matter as much as calories.",nut:["iron","omega","protein"],eat:["ep","bc","fs"],care:"Never leave a baby alone while eating. No whole nuts or hard round pieces."},
+ {to:24,t:"Family food, small plate",ut:"گھر کا کھانا، چھوٹی پلیٹ",dev:"The child eats what the house eats, with less chilli and more fat. Brain wiring continues right through the second year, when many children's diets get thinner instead of richer.",nut:["omega","energy","calcium"],eat:["sr","nd","vp"],care:"Keep milk to about two cups a day — too much milk crowds out iron foods."},
+ {to:60,t:"The fussy years",ut:"نخروں کے سال",dev:"Appetite swings and refusals are normal at this age, not a sign of illness. Growth slows compared with infancy, so children genuinely need less than parents expect.",nut:["protein","vitA","fibre"],eat:["cc","lb","bc"],care:"Offer, don't force. A food may need eight tries before it is accepted."},
+ {to:250,t:"School days",ut:"اسکول کے دن",dev:"Concentration at school runs on breakfast. A child sent out on tea and a biscuit is running on nothing by second period.",nut:["protein","iron","energy"],eat:["bc","ab","cc"],care:"Send water from home rather than money for a fizzy drink."}
+];
+
+/* ---------- state ---------- */
+const S={lang:"en",step:0,done:0,view:"today",quality:1,
+ city:"",house:5,budget:2,energy:2,veg:0,noEgg:0,noDairy:0,avoid:"",
+ status:"pregnant",dateMethod:"lmp",week:26,babyM:8,kids:[],
+ routine:"daily",cookStyle:["batch"],pantry:[],plan:null,chat:[],log:{},basket:[],focusMeal:null};
+function save(){try{localStorage.setItem(APP.key,JSON.stringify(S))}catch(e){}}
+function load(){try{const r=localStorage.getItem(APP.key);if(r)Object.assign(S,JSON.parse(r),{chat:[]})}catch(e){}}
+
+function stage(){
+ if(S.status==="feeding"){const s=C_ST.find(x=>S.babyM<x.to)||C_ST[C_ST.length-1];
+  return Object.assign({},s,{label:S.babyM<24?S.babyM+" months old":Math.round(S.babyM/12)+" years old",prog:Math.min(1,S.babyM/24)});}
+ const s=P_ST.find(x=>S.week<=x.to)||P_ST[P_ST.length-1];
+ return Object.assign({},s,{label:"Week "+S.week+" · trimester "+(S.week<=13?1:S.week<=27?2:3),prog:Math.min(1,S.week/40)});
+}
+const COSTL=()=>["",T("cheap"),T("mid"),T("high")];
+
+/* ---------- feature 5/6: choosing meals ---------- */
+function allowed(r){
+ if(S.veg&&!r.veg&&!r.egg&&!r.dairy)return 0;
+ if(S.noEgg&&r.egg)return 0;
+ if(S.noDairy&&r.dairy)return 0;
+ if(r.cost>S.budget)return 0;
+ if(S.energy===1&&!r.quick)return 0;
+ if(S.routine==="rare"&&!(r.batch||r.nocook||r.quick))return 0;
+ const av=(S.avoid||"").toLowerCase().split(/[,\s]+/).filter(x=>x.length>2);
+ if(av.some(a=>r.keys.some(k=>k.includes(a))||r.en.toLowerCase().includes(a)))return 0;
+ return 1;
+}
+function sc_(r,st){return r.nut.filter(n=>st.nut.includes(n)).length*3+(st.eat.includes(r.id)?2:0)+Math.random();}
+function plan(){
+ const st=stage(),used=[],out={};
+ ["breakfast","lunch","snack","dinner"].forEach(sl=>{
+  let p=REC.filter(r=>r.slot.includes(sl)&&allowed(r)&&!used.includes(r.id));
+  if(!p.length)p=REC.filter(r=>r.slot.includes(sl)&&!used.includes(r.id));
+  if(!p.length)p=REC.slice();
+  p.sort((a,b)=>sc_(b,st)-sc_(a,st));out[sl]=p[0];used.push(p[0].id);});
+ S.plan=out;
+ const k=new Date().toDateString();S.log[k]=used;
+ const keys=Object.keys(S.log);if(keys.length>10)delete S.log[keys[0]];
+ save();return out;
+}
+function pickWhy(r){const st=stage(),m=r.nut.filter(n=>st.nut.includes(n)).map(n=>NUTS[n][S.lang==="ur"?1:0]);
+ return m.length?B("Chosen for this stage: ","اس مرحلے کے لیے: ")+m.join(", "):"";}
+function mealHTML(r,sl){
+ return `<button class="meal" data-meal="${r.id}">
+  <span class="glyph">${r.em}</span><span class="mbody">
+  ${sl?`<span class="slot">${T(sl)} · ${r.mins} min</span>`:""}
+  <span class="mt">${S.lang==="ur"?r.ur:r.en}</span><span class="mu">${S.lang==="ur"?r.en:r.ur}</span>
+  <span class="mw">${r.why}</span>
+  <span class="tagrow">${r.nut.map(n=>`<span class="tag">${NUTS[n][S.lang==="ur"?1:0]}</span>`).join("")}<span class="tag cost">${COSTL()[r.cost]}</span></span>
+  <span class="pick">${pickWhy(r)}</span></span></button>`;
+}
+
+/* =====================  ONBOARDING — features 1,2,3,4,7  ===================== */
+const STEPS=[
+ {n:1,t:["Mother's profile","ماں کی معلومات"],s:["Language, area, household and budget","زبان، علاقہ، گھرانہ اور بجٹ"]},
+ {n:1,t:["About you","آپ کے بارے میں"],s:["Status, food preferences and allergies","حالت، کھانے کی پسند اور الرجی"]},
+ {n:2,t:["Safe pregnancy dating","حمل کی محفوظ تاریخ"],s:["An estimate now; confirm it at the clinic","ابھی اندازہ؛ کلینک سے تصدیق کروائیں"]},
+ {n:3,t:["Your baby's journey","بچے کا سفر"],s:["What is growing right now","اس وقت کیا بن رہا ہے"]},
+ {n:4,t:["Your children","آپ کے بچے"],s:["Age, feeding stage and needs","عمر، غذا کا مرحلہ اور ضروریات"]},
+ {n:7,t:["Cooking routine","پکانے کا معمول"],s:["How often you can actually cook","آپ حقیقت میں کتنی بار پکا سکتی ہیں"]}
+];
+function onb(){
+ $("#onb").innerHTML=`<div class="obar"><i id="obar"></i></div>
+  <div class="steps"><div class="step on" id="stepbox"></div></div>`;
+ drawStep();
+}
+function drawStep(){
+ const i=S.step,d=STEPS[i];
+ $("#obar").style.width=((i+1)/STEPS.length*100)+"%";
+ $("#stepbox").innerHTML=`<p class="oe">${B("Step","مرحلہ")} ${i+1}/${STEPS.length} · ${B("feature","خصوصیت")} ${d.n}</p>
+  <h1>${d.t[S.lang==="ur"?1:0]}</h1><p class="lede">${d.s[S.lang==="ur"?1:0]}</p>
+  <div id="stepbody">${[sA,sB,sC,sD,sE,sF][i]()}</div>
+  <div class="row">${i?`<button class="btn ghost" data-go="${i-1}">${T("back")}</button>`:""}
+   <button class="btn big" data-go="${i+1}">${i===STEPS.length-1?B("Build today's plan","آج کا منصوبہ بنائیں"):T("next")}</button></div>`;
+ SCENE.focus(i===3?"analysis":"onboard");SCENE.setStage(stage().prog);
+ if(i===2)dateCalc();
+}
+function sA(){return `
+ <label class="fld"><span>${B("Language","زبان")}</span><div class="pills">
+   <button class="pill" data-lang="en" aria-pressed="${S.lang==="en"}">English</button>
+   <button class="pill" data-lang="ur" aria-pressed="${S.lang==="ur"}">اردو</button>
+   <button class="pill" disabled>پښتو · ${B("after pilot","پائلٹ کے بعد")}</button></div></label>
+ <label class="fld"><span>${B("Your area (for seasonal food and prices)","آپ کا علاقہ")}</span>
+   <input type="text" data-f="city" value="${S.city}" placeholder="${B("e.g. Rawalpindi","مثلاً راولپنڈی")}"></label>
+ <label class="fld"><span>${B("People eating at home","گھر میں کھانے والے افراد")}: <b id="hh">${S.house}</b></span>
+   <input type="range" min="2" max="14" value="${S.house}" data-r="house"></label>
+ <label class="fld"><span>${B("What can you usually spend on food each day?","روزانہ کھانے پر کتنا خرچ ہو سکتا ہے؟")}</span>
+   <div class="pills">${[1,2,3].map(v=>`<button class="pill" data-set="budget" data-v="${v}" aria-pressed="${S.budget===v}">${COSTL()[v]}</button>`).join("")}</div></label>`;}
+function sB(){return `
+ <label class="fld"><span>${B("Right now you are","اس وقت آپ")}</span><div class="pills">
+  ${[["pregnant",B("Pregnant","حاملہ")],["feeding",B("Breastfeeding","دودھ پلا رہی ہیں")],["both",B("Both","دونوں")]]
+   .map(([v,t])=>`<button class="pill" data-set="status" data-v="${v}" aria-pressed="${S.status===v}">${t}</button>`).join("")}</div></label>
+ <label class="fld"><span>${B("Food preferences","کھانے کی پسند")}</span><div class="pills">
+  <button class="pill" data-tog="veg" aria-pressed="${!!S.veg}">${B("No meat","گوشت نہیں")}</button>
+  <button class="pill" data-tog="noEgg" aria-pressed="${!!S.noEgg}">${B("No eggs","انڈا نہیں")}</button>
+  <button class="pill" data-tog="noDairy" aria-pressed="${!!S.noDairy}">${B("No dairy","دودھ دہی نہیں")}</button></div></label>
+ <label class="fld"><span>${B("Allergies or anything you cannot eat","الرجی یا جو نہیں کھا سکتیں")}</span>
+  <input type="text" data-f="avoid" value="${S.avoid}" placeholder="${B("e.g. peanut, fish","مثلاً مونگ پھلی، مچھلی")}"></label>`;}
+function sC(){
+ if(S.status==="feeding")return `
+  <label class="fld"><span>${B("How old is your youngest child?","آپ کا سب سے چھوٹا بچہ کتنے ماہ کا ہے؟")} <b id="bmv">${S.babyM}</b> ${B("months","ماہ")}</span>
+   <input type="range" min="0" max="36" value="${S.babyM}" data-r="babyM"></label>
+  <p class="stagenow" id="sn"></p>`;
+ return `
+ <label class="fld"><span>${B("How would you like to work out the date?","تاریخ کیسے معلوم کریں؟")}</span><div class="pills">
+  ${[["lmp",B("Last period date","آخری ماہواری")],["edd",B("Delivery date given","متوقع تاریخ")],["scan",B("Ultrasound weeks","الٹراساؤنڈ ہفتے")],["guess",B("Doctor's estimate","ڈاکٹر کا اندازہ")]]
+   .map(([v,t])=>`<button class="pill" data-set="dateMethod" data-v="${v}" aria-pressed="${S.dateMethod===v}">${t}</button>`).join("")}</div></label>
+ <div id="dateIn"></div>
+ <div class="bignum"><b id="wv">${S.week}</b><span>${B("weeks pregnant","ہفتے کا حمل")}</span></div>
+ <p class="stagenow" id="sn"></p>
+ <div class="note">${B("This is an estimate only. An ultrasound or your doctor gives the accurate date, and the app will follow whatever they tell you.","یہ صرف اندازہ ہے۔ درست تاریخ الٹراساؤنڈ یا ڈاکٹر بتاتا ہے، ایپ اسی کے مطابق چلے گی۔")}</div>`;}
+function dateCalc(){
+ const box=$("#dateIn");
+ if(box){
+  const m=S.dateMethod;
+  box.innerHTML = m==="lmp" ? `<label class="fld"><span>${B("First day of your last period","آخری ماہواری کا پہلا دن")}</span><input type="date" data-d="lmp"></label>`
+   : m==="edd" ? `<label class="fld"><span>${B("Expected delivery date","متوقع تاریخِ پیدائش")}</span><input type="date" data-d="edd"></label>`
+   : `<label class="fld"><span>${B("Weeks they told you","جتنے ہفتے بتائے گئے")}: <b id="wvv">${S.week}</b></span><input type="range" min="4" max="42" value="${S.week}" data-r="week"></label>`;
+ }
+ refreshStage();
+}
+function refreshStage(){
+ const st=stage();
+ const sn=$("#sn");if(sn)sn.textContent=S.lang==="ur"?st.ut:st.t;
+ const wv=$("#wv");if(wv)wv.textContent=S.week;
+ const bv=$("#bmv");if(bv)bv.textContent=S.babyM;
+ SCENE.setStage(st.prog);
+}
+function sD(){const st=stage();return `
+ <h2 class="big2">${S.lang==="ur"?st.ut:st.t}</h2><p class="stlab">${st.label}</p>
+ <p class="lede">${st.dev}</p>
+ <h3 class="sec">${B("What your body needs most right now","اس وقت جسم کو سب سے زیادہ کیا چاہیے")}</h3>
+ ${st.nut.map(n=>`<div class="card nut"><b>${NUTS[n][S.lang==="ur"?1:0]}</b><p>${NUTS[n][2]}</p><p class="src">${B("Found in","ملتا ہے")}: ${NUTS[n][3]}</p></div>`).join("")}
+ <h3 class="sec">${B("So on your plate this week","اس ہفتے پلیٹ میں")}</h3>
+ ${st.eat.map(id=>mealHTML(REC.find(r=>r.id===id),null)).join("")}
+ <div class="note">${st.care}</div>`;}
+function sE(){return `
+ <div id="kidbox">${kidList()}</div>
+ <div class="row nowrap"><input type="number" id="kAge" min="0" max="18" placeholder="${B("Age","عمر")}" style="max-width:110px">
+  <select id="kUnit"><option value="m">${B("months","ماہ")}</option><option value="y">${B("years","سال")}</option></select>
+  <button class="btn" data-act="addkid">${B("Add child","بچہ شامل کریں")}</button></div>
+ <p class="lede" style="margin-top:12px">${B("You can add as many children as you have. Each one gets its own feeding stage and portion advice.","جتنے بچے ہیں شامل کریں۔ ہر بچے کے لیے الگ مرحلہ اور مقدار کا مشورہ ملے گا۔")}</p>`;}
+function kidList(){
+ if(!S.kids.length)return `<div class="empty">${B("No children added yet.","ابھی کوئی بچہ شامل نہیں۔")}</div>`;
+ return S.kids.map((k,i)=>{
+  const mo=k.unit==="m"?k.age:k.age*12;
+  const need=mo<6?B("Only mother's milk","صرف ماں کا دودھ"):mo<9?B("Starting thick mashes","گاڑھی غذا کا آغاز"):
+   mo<12?B("Learning to chew","چبانا سیکھ رہا ہے"):mo<24?B("Soft family food","نرم گھر کا کھانا"):
+   mo<60?B("Family food, small plate","گھر کا کھانا، چھوٹی پلیٹ"):B("School-day meals","اسکول کے کھانے");
+  return `<div class="kid"><span class="kico">🧒</span><span><b>${k.age} ${k.unit==="m"?B("months","ماہ"):B("years","سال")}</b><br><span class="muted">${need}</span></span>
+   <button data-rmkid="${i}" aria-label="remove">✕</button></div>`;}).join("");
+}
+function sF(){return `
+ <label class="fld"><span>${B("How often can you cook a proper meal?","آپ کتنی بار ڈھنگ کا کھانا پکا سکتی ہیں؟")}</span><div class="pills">
+  ${[["daily",B("Most days","تقریباً روز")],["twice",B("Two or three times a week","ہفتے میں دو تین بار")],["rare",B("Rarely — I need easy food","کم — آسان کھانا چاہیے")]]
+   .map(([v,t])=>`<button class="pill" data-set="routine" data-v="${v}" aria-pressed="${S.routine===v}">${t}</button>`).join("")}</div></label>
+ <label class="fld"><span>${B("What works in your kitchen?","آپ کی رسوئی میں کیا چلتا ہے؟")}</span><div class="pills">
+  ${[["batch",B("Cook once, eat twice","ایک بار پکا کر دو بار")],["leftover",B("Use leftovers","بچا کھانا استعمال")],["nocook",B("No-cook meals","بغیر پکائے کھانا")]]
+   .map(([v,t])=>`<button class="pill" data-multi="${v}" aria-pressed="${S.cookStyle.includes(v)}">${t}</button>`).join("")}</div></label>
+ <label class="fld"><span>${B("Strength you usually have at cooking time","پکاتے وقت عموماً کتنی ہمت ہوتی ہے")}</span><div class="pills">
+  ${[[1,B("Very tired","بہت تھکن")],[2,B("Alright","ٹھیک")],[3,B("Able to cook properly","اچھی طرح پکا سکتی ہوں")]]
+   .map(([v,t])=>`<button class="pill" data-set="energy" data-v="${v}" aria-pressed="${S.energy===v}">${t}</button>`).join("")}</div></label>`;}
+
+/* =====================  MAIN APP  ===================== */
+const VIEWS=["today","meals","family","learn","ask"];
+const ICON=["◍","◒","❋","▤","✦"];
+const HEAD={
+ today:[["Today","آج"],["What can we cook today?","آج کیا پکائیں؟"],["Chosen for your stage, your budget and your strength today.","آپ کے مرحلے، بجٹ اور آج کی ہمت کے مطابق۔"]],
+ meals:[["Meals","کھانے"],["Your kitchen, every way","آپ کی رسوئی، ہر پہلو سے"],["Plan, cook, stretch, rescue, shop and store.","منصوبہ، پکانا، بچت، اصلاح، خریداری اور حفاظت۔"]],
+ family:[["My Family","میرا گھرانہ"],["Who I am cooking for","میں کس کے لیے پکا رہی ہوں"],["Your profile, your children, and help when a child will not eat.","آپ کی معلومات، بچے، اور کھانے سے انکار پر مدد۔"]],
+ learn:[["Learn","سیکھیں"],["Small things that matter","چھوٹی باتیں، بڑا فرق"],["Short guidance on pregnancy, feeding, hygiene and food safety.","حمل، خوراک، صفائی اور کھانے کی حفاظت کی مختصر رہنمائی۔"]],
+ ask:[["Ask","پوچھیں"],["Ask nani jaan","نانی جان سے پوچھیں"],["Voice or text — with a clear nudge when it is time to see someone.","آواز یا تحریر — اور ضرورت پر ڈاکٹر کے پاس جانے کا مشورہ۔"]]};
+function renderChrome(){
+ $("#nav").innerHTML=VIEWS.map((v,i)=>`<button data-v="${v}" aria-current="${S.view===v}">
+  <span class="ico">${ICON[i]}</span><span class="lbl">${T_.nav[i][S.lang==="ur"?1:0]}</span></button>`).join("");
+ $("#lbtn").textContent=S.lang==="ur"?"English":"اردو";
+ document.body.dir=S.lang==="ur"?"rtl":"ltr";
+}
+function go(v){
+ S.view=v;renderChrome();
+ const h=HEAD[v],i=S.lang==="ur"?1:0;
+ $("#pe").textContent=h[0][i];$("#pt").textContent=h[1][i];$("#pl").textContent=h[2][i];
+ ({today:vToday,meals:vMeals,family:vFamily,learn:vLearn,ask:vAsk})[v]();
+ $("#body").scrollTop=0;SCENE.focus(v);save();
+}
+function enter(){$("#onb").classList.add("gone");$("#app").classList.add("on");renderChrome();go("today");SCENE.bloom();}
+
+/* feature 6: Today dashboard */
+const TIPS=[["Cook the daal thick, not thin. Water fills the stomach; daal feeds the child.","دال گاڑھی پکائیں۔ پانی پیٹ بھرتا ہے، دال غذا دیتی ہے۔"],
+ ["Keep your tea an hour away from your food, or the iron walks out with it.","چائے کھانے سے ایک گھنٹہ الگ رکھیں، ورنہ فولاد ضائع ہو جاتا ہے۔"],
+ ["Eat with the children, not after them. A tired mother forgets her own plate.","بچوں کے ساتھ کھائیں، بعد میں نہیں۔ تھکی ماں اپنی پلیٹ بھول جاتی ہے۔"],
+ ["Yesterday's rice and a handful of daal make today's khichri.","کل کے چاول اور ایک مٹھی دال آج کی کھچڑی۔"],
+ ["Squeeze lemon on the daal. Two rupees, and the iron works twice as hard.","دال پر لیموں نچوڑیں۔ دو روپے، فولاد دگنا فائدہ۔"]];
+function vToday(){
+ const p=S.plan||plan(),st=stage(),i=S.lang==="ur"?1:0;
+ const pri=st.nut.slice(0,2).map(n=>NUTS[n][i]);
+ $("#body").innerHTML=`
+ <div class="card stage"><b>${S.lang==="ur"?st.ut:st.t}</b><span class="stlab">${st.label}</span>
+  <p>${st.dev}</p><div class="tagrow">${st.nut.map(n=>`<span class="tag">${NUTS[n][i]}</span>`).join("")}</div>
+  <button class="link" data-act="redate">${B("Change the stage","مرحلہ تبدیل کریں")}</button></div>
+ <div class="card prio"><b>${B("Two things that matter today","آج کی دو اہم باتیں")}</b>
+  <p>1 · ${B("Get "+pri[0]+" onto at least one plate today.","آج کم از کم ایک پلیٹ میں "+pri[0]+" ضرور ہو۔")}</p>
+  <p>2 · ${B("Keep tea an hour away from meals, and drink water through the day.","چائے کھانے سے ایک گھنٹہ الگ، اور دن بھر پانی پیئیں۔")}</p></div>
+ <h3 class="sec">${B("Today's meals","آج کے کھانے")}</h3>
+ <div class="mealwrap">${["breakfast","lunch","snack","dinner"].map(s=>mealHTML(p[s],s)).join("")}</div>
+ <div class="row"><button class="btn" data-act="reroll">${B("Other ideas","دوسرے مشورے")}</button>
+  <button class="btn ghost" data-act="tolimits">${B("Change budget or strength","بجٹ یا ہمت بدلیں")}</button></div>
+ <div class="nani"><span class="av">👵</span><p><b>${B("Nani jaan says","نانی جان کہتی ہیں")}</b>${TIPS[new Date().getDate()%TIPS.length][i]}</p></div>
+ <p class="safety">${T("safety")}</p>`;
+}
+/* features 8-19 */
+const MTABS=[["plan",["Family meal","سب کا کھانا"]],["kitchen",["My kitchen","میری رسوئی"]],["limits",["Budget & strength","بجٹ اور ہمت"]],
+ ["rescue",["Meal rescue","کھانے کی اصلاح"]],["week",["This week","اس ہفتہ"]],["basket",["Shopping","خریداری"]],["store",["Storage","حفاظت"]]];
+function vMeals(){
+ const i=S.lang==="ur"?1:0;
+ $("#body").innerHTML=`<div class="tabs">${MTABS.map(([k,l],n)=>`<button data-t="${k}" aria-selected="${!n}">${l[i]}</button>`).join("")}</div>
+  ${MTABS.map(([k],n)=>`<div class="pane${n?"":" on"}" id="t-${k}"></div>`).join("")}
+  <p class="safety">${T("safety")}</p>`;
+ tPlan();tKitchen();tLimits();tRescue();tWeek();tBasket();tStore();
+}
+function tab(k){$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===k));
+ $$(".pane").forEach(p=>p.classList.toggle("on",p.id==="t-"+k));}
+function tPlan(){/* 8 + 9 */
+ const r=REC.find(x=>x.id===S.focusMeal)||(S.plan?S.plan.dinner:REC[0]);
+ $("#t-plan").innerHTML=`<p class="lede">${B("One pot for the whole house, changed a little for each person.","ایک ہی دیگچی پورے گھر کے لیے، ہر فرد کے لیے تھوڑی تبدیلی۔")}</p>
+  ${mealHTML(r,null)}
+  <h3 class="sec">${B("What changes for whom","کس کے لیے کیا بدلے")}</h3>
+  <div class="card"><b>${B("For you","آپ کے لیے")}</b><p>${r.mother}</p></div>
+  <div class="card"><b>${B("For the baby","ننھے بچے کے لیے")}</b><p>${r.baby}</p></div>
+  <div class="card"><b>${B("For older children","بڑے بچوں کے لیے")}</b><p>${r.child}</p></div>
+  <h3 class="sec">${B("Smart substitutions","سستے متبادل")}</h3>
+  ${[[B("No meat","گوشت نہیں"),B("Daal, chana or an egg give the same strength for far less.","دال، چنا یا انڈا بہت کم قیمت میں وہی طاقت دیتے ہیں۔")],
+     [B("No fresh milk","تازہ دودھ نہیں"),B("Use dahi, or powdered milk mixed thin.","دہی یا خشک دودھ پتلا کر کے استعمال کریں۔")],
+     [B("No vegetables","سبزی نہیں"),B("Any seasonal sabzi works — buy whatever is cheapest that day.","کوئی بھی موسمی سبزی چلے گی۔")],
+     [B("No ghee","گھی نہیں"),B("A spoon of cooking oil does the same job in a child's plate.","بچے کی پلیٹ میں ایک چمچ تیل وہی کام کرتا ہے۔")],
+     [B("No fish","مچھلی نہیں"),B("Egg yolk and crushed walnut carry the same brain fats.","انڈے کی زردی اور پسا اخروٹ وہی دماغی چکنائی دیتے ہیں۔")]]
+    .map(x=>`<div class="card flat"><b>${x[0]}</b><p>${x[1]}</p></div>`).join("")}`;
+}
+function tKitchen(){/* 10 + 11 */
+ $("#t-kitchen").innerHTML=`<p class="lede">${B("Say or type what is in the house right now.","بولیں یا لکھیں کہ گھر میں اس وقت کیا ہے۔")}</p>
+  <div class="row nowrap"><input type="text" id="pin" placeholder="${B("daal, rice, onion, egg…","دال، چاول، پیاز، انڈا…")}">
+   <button class="mic" data-act="pmic">🎙</button></div>
+  <div class="pills" id="ppill"></div>
+  <button class="btn big" data-act="cook">${B("What can I make with this?","اس سے کیا بن سکتا ہے؟")}</button>
+  <div id="kout"></div>`;
+ pantry();
+ $("#pin").addEventListener("keydown",e=>{if(e.key==="Enter"){addP($("#pin").value);$("#pin").value="";}});
+}
+function pantry(){
+ const el=$("#ppill");if(!el)return;
+ const q=["daal","rice","atta","egg","aloo","onion","dahi","palak","chana","milk"];
+ el.innerHTML=S.pantry.map(p=>`<button class="pill" aria-pressed="true" data-rm="${p}">${p} ✕</button>`).join("")
+  +q.filter(x=>!S.pantry.includes(x)).map(x=>`<button class="pill" data-ad="${x}">+ ${x}</button>`).join("");
+}
+function addP(s){(s||"").toLowerCase().split(/[,،]| and /).map(x=>x.trim()).filter(Boolean)
+ .forEach(x=>{if(!S.pantry.includes(x))S.pantry.push(x)});pantry();save();SCENE.bloom();}
+function cook(){
+ const st=stage();
+ const hit=REC.map(r=>({r,h:r.keys.filter(k=>S.pantry.some(p=>k.includes(p)||p.includes(k))).length}))
+  .filter(x=>x.h>0).sort((a,b)=>(b.h+(allowed(b.r)?1.5:0)+sc_(b.r,st)/4)-(a.h+(allowed(a.r)?1.5:0)+sc_(a.r,st)/4)).slice(0,3);
+ const o=$("#kout");
+ if(!S.pantry.length){o.innerHTML=`<div class="empty">${B("Add what you have first.","پہلے بتائیں گھر میں کیا ہے۔")}</div>`;return;}
+ if(!hit.length){o.innerHTML=`<div class="empty">${B("Nothing complete comes out of these alone. Add daal, rice, atta, egg or dahi.","ان سے مکمل کھانا نہیں بنتا۔ دال، چاول، آٹا، انڈا یا دہی شامل کریں۔")}</div>`;return;}
+ o.innerHTML=`<h3 class="sec">${B("You can make this today","آج یہ بن سکتا ہے")}</h3>`+hit.map(x=>mealHTML(x.r,null)).join("");
+ SCENE.bloom();
+}
+function tLimits(){/* 12 + 13 + 14 */
+ $("#t-limits").innerHTML=`
+ <label class="fld"><span>${B("Money available today","آج دستیاب رقم")}</span><div class="pills">
+  ${[1,2,3].map(v=>`<button class="pill" data-set="budget" data-v="${v}" aria-pressed="${S.budget===v}">${COSTL()[v]}</button>`).join("")}</div></label>
+ <label class="fld"><span>${B("Strength today","آج کی ہمت")}</span><div class="pills">
+  ${[[1,B("Very tired or unwell","بہت تھکن یا طبیعت خراب")],[2,B("Alright","ٹھیک")],[3,B("Able to cook properly","اچھی طرح پکا سکتی ہوں")]]
+   .map(([v,t])=>`<button class="pill" data-set="energy" data-v="${v}" aria-pressed="${S.energy===v}">${t}</button>`).join("")}</div></label>
+ <div class="note">${B("On a low-strength day you are only shown one-pot meals that need little fuel and little standing.","کم ہمت والے دن صرف ایک دیگچی والے، کم ایندھن کے کھانے دکھائے جائیں گے۔")}</div>
+ <h3 class="sec">${B("When time, fuel or money runs out","جب وقت، ایندھن یا پیسے ختم ہوں")}</h3>
+ ${REC.filter(r=>r.nocook||r.quick).slice(0,4).map(r=>mealHTML(r,null)).join("")}
+ <button class="btn big" data-act="reroll">${B("Rebuild today's plan","آج کا منصوبہ دوبارہ بنائیں")}</button>`;
+}
+const RESC=[[["Plain rice","سادہ چاول"],["Add a bowl of daal or dahi beside it. Rice alone fills the stomach without feeding the body.","ساتھ دال یا دہی رکھیں۔ اکیلے چاول پیٹ بھرتے ہیں، غذا نہیں دیتے۔"]],
+ [["Roti with tea","روٹی اور چائے"],["Swap the tea for dahi or milk and add an egg. Tea with a meal blocks iron.","چائے کی جگہ دہی یا دودھ اور ایک انڈا۔ کھانے کے ساتھ چائے فولاد روکتی ہے۔"]],
+ [["Only sabzi and roti","صرف سبزی روٹی"],["Add a boiled egg, chana or yogurt so there is protein on the plate.","ابلا انڈا، چنا یا دہی شامل کریں تاکہ پروٹین ہو۔"]],
+ [["Instant noodles","نوڈلز"],["Crack an egg in and add any leftover vegetable. Fruit or dahi after.","ایک انڈا توڑ دیں اور بچی سبزی ڈالیں۔ بعد میں پھل یا دہی۔"]],
+ [["Biscuits for the child","بچے کو بسکٹ"],["Roti with gur, a banana, or boiled chana — same cost, far more in them.","گڑ والی روٹی، کیلا یا ابلے چنے — خرچ وہی، فائدہ زیادہ۔"]]];
+function tRescue(){/* 15 */
+ const i=S.lang==="ur"?1:0;
+ $("#t-rescue").innerHTML=`<p class="lede">${B("Food already cooked? Add one small thing and make it better.","کھانا پک چکا ہے؟ ایک چھوٹی چیز شامل کر کے بہتر بنائیں۔")}</p>
+  <div class="pills">${RESC.map((x,n)=>`<button class="pill" data-resc="${n}">${x[0][i]}</button>`).join("")}</div><div id="ro"></div>`;
+}
+function tWeek(){/* 16 */
+ const days=Object.values(S.log).slice(-7),i=S.lang==="ur"?1:0;
+ const count={};Object.keys(GROUPS).forEach(g=>count[g]=0);
+ days.forEach(d=>d.forEach(id=>{const r=REC.find(x=>x.id===id);r&&r.grp.forEach(g=>count[g]++)}));
+ const max=Math.max(1,...Object.values(count));
+ const weak=Object.keys(GROUPS).filter(g=>count[g]<=max*0.34);
+ $("#t-week").innerHTML=`<p class="lede">${B("What your family's plates have carried over the last few days.","پچھلے چند دنوں میں گھر کی پلیٹوں میں کیا رہا۔")}</p>
+  ${Object.keys(GROUPS).map(g=>`<div class="bar"><span>${GROUPS[g][i]}</span>
+    <i style="width:${Math.round(count[g]/max*100)}%"></i><em>${count[g]}</em></div>`).join("")}
+  ${weak.length?`<div class="note">${B("Thin this week: ","اس ہفتے کم رہا: ")}${weak.map(g=>GROUPS[g][i]).join(", ")}. ${B("The meals below fill exactly that gap.","نیچے کے کھانے یہی کمی پوری کرتے ہیں۔")}</div>
+   ${REC.filter(r=>r.grp.some(g=>weak.includes(g))).slice(0,3).map(r=>mealHTML(r,null)).join("")}`
+   :`<div class="note">${B("A good balance so far. Keep it going.","اب تک توازن اچھا ہے۔ اسی طرح جاری رکھیں۔")}</div>`}`;
+}
+function tBasket(){/* 17 + 18 */
+ const p=S.plan||plan();
+ const items=[...new Set(Object.values(p).flatMap(r=>r.buy))];
+ if(!S.basket.length)S.basket=items;
+ $("#t-basket").innerHTML=`<p class="lede">${B("Built from this week's meals and "+S.house+" people at home. Edit anything.","اس ہفتے کے کھانوں اور گھر کے "+S.house+" افراد کے حساب سے۔ تبدیلی کر سکتی ہیں۔")}</p>
+  <div class="pills" id="bk">${S.basket.map((x,n)=>`<button class="pill" aria-pressed="true" data-bk="${n}">${x} ✕</button>`).join("")}</div>
+  <div class="row nowrap"><input type="text" id="bin" placeholder="${B("add an item","چیز شامل کریں")}">
+   <button class="btn" data-act="addbk">+</button></div>
+  <button class="btn big" data-act="share">${B("Send this list to someone at home","یہ فہرست گھر والے کو بھیجیں")}</button>
+  <p class="lede" style="margin-top:8px">${B("Opens WhatsApp with the list written out — for a husband, mother-in-law or older child going to the market.","واٹس ایپ کھل جائے گا، فہرست لکھی ہوئی — شوہر، ساس یا بڑے بچے کے لیے جو بازار جا رہا ہو۔")}</p>`;
+}
+function tStore(){/* 19 */
+ const i=S.lang==="ur"?1:0;
+ const C=[[["Cooked food","پکا ہوا کھانا"],["Cover it and keep it out no more than two hours in warm weather. After that it belongs in the fridge or it goes.","ڈھانپ کر رکھیں، گرمی میں دو گھنٹے سے زیادہ باہر نہیں۔ اس کے بعد فریج میں یا پھینک دیں۔"]],
+  [["Reheating","دوبارہ گرم کرنا"],["Heat until it steams right through, and only once. Never reheat the same daal a third time.","بھاپ آنے تک گرم کریں، اور صرف ایک بار۔ ایک ہی دال تیسری بار نہ گرم کریں۔"]],
+  [["Milk and dahi","دودھ اور دہی"],["Boil fresh milk before storing. Keep dahi covered and away from raw meat.","تازہ دودھ ابال کر رکھیں۔ دہی ڈھانپ کر، کچے گوشت سے دور رکھیں۔"]],
+  [["Leftover rice","بچے ہوئے چاول"],["Cool it fast, keep it covered, and use it within a day — tomorrow's khichri is the safest use.","جلدی ٹھنڈا کریں، ڈھانپ کر رکھیں، ایک دن میں استعمال کریں — کل کی کھچڑی سب سے محفوظ استعمال ہے۔"]],
+  [["Thawing meat","گوشت پگھلانا"],["Thaw in the fridge or in cold water, never on the counter. Never refreeze it once thawed.","فریج یا ٹھنڈے پانی میں پگھلائیں، کھلے میں نہیں۔ پگھلنے کے بعد دوبارہ نہ جمائیں۔"]],
+  [["Baby food","بچے کا کھانا"],["Make it fresh each time. Never save what the baby has already eaten from.","ہر بار تازہ بنائیں۔ جس سے بچہ کھا چکا ہو وہ نہ رکھیں۔"]]];
+ $("#t-store").innerHTML=C.map(c=>`<div class="card"><b>${c[0][i]}</b><p>${c[1][i]}</p></div>`).join("");
+}
+/* features 1,2,4,20,21 */
+function vFamily(){
+ const i=S.lang==="ur"?1:0;
+ $("#body").innerHTML=`
+ <h3 class="sec">${B("Your profile","آپ کی معلومات")}</h3>
+ <div class="card"><b>${S.status==="pregnant"?B("Pregnant","حاملہ"):S.status==="feeding"?B("Breastfeeding","دودھ پلا رہی ہیں"):B("Pregnant and breastfeeding","حاملہ اور دودھ پلا رہی ہیں")}</b>
+  <p>${stage().label} · ${S.city||B("area not set","علاقہ درج نہیں")} · ${S.house} ${B("people at home","افراد")}</p>
+  <button class="link" data-act="redate">${B("Edit profile and dating","معلومات اور تاریخ تبدیل کریں")}</button></div>
+ <h3 class="sec">${B("Children","بچے")}</h3>
+ <div id="kidbox">${kidList()}</div>
+ <div class="row nowrap"><input type="number" id="kAge" min="0" max="18" placeholder="${B("Age","عمر")}" style="max-width:110px">
+  <select id="kUnit"><option value="m">${B("months","ماہ")}</option><option value="y">${B("years","سال")}</option></select>
+  <button class="btn" data-act="addkid">${B("Add child","بچہ شامل کریں")}</button></div>
+ <h3 class="sec">${B("When a child will not eat","جب بچہ کھانا نہ کھائے")}</h3>
+ <div class="pills">${CHILD.map((c,n)=>`<button class="pill" data-child="${n}">${c[0][i]}</button>`).join("")}</div>
+ <div id="chout"></div>
+ <h3 class="sec">${B("School-day nutrition","اسکول کے دن کی خوراک")}</h3>
+ ${SCHOOL.map(s=>`<div class="card"><b>${s[0][i]}</b><p>${s[1][i]}</p></div>`).join("")}
+ <p class="safety">${T("safety")}</p>`;
+}
+const CHILD=[[["Refuses everything","ہر چیز سے انکار"],["Offer a small portion, sit and eat together, and take it away without anger. Try the same food again another day — a child may need eight tries. Cut biscuits between meals so real hunger arrives at mealtime.","تھوڑی مقدار دیں، ساتھ بیٹھ کر کھائیں، انکار پر غصے کے بغیر ہٹا دیں۔ وہی چیز کسی اور دن پھر دیں — آٹھ بار تک لگ سکتے ہیں۔ کھانوں کے درمیان بسکٹ بند کریں۔"]],
+ [["Eats very little","بہت کم کھاتا ہے"],["Make each spoon count: a spoon of ghee or oil in the food, milk instead of water in sooji, mashed banana, and one extra small meal between the main ones.","ہر چمچ بھرپور بنائیں: کھانے میں ایک چمچ گھی، سوجی میں پانی کی جگہ دودھ، میش کیا کیلا، اور دو کھانوں کے درمیان ایک اضافی چھوٹا کھانا۔"]],
+ [["Only wants milk","صرف دودھ مانگتا ہے"],["After one year keep milk to about two cups a day. Too much milk fills the stomach and crowds out the iron foods a child needs.","ایک سال کے بعد دودھ تقریباً دو کپ روزانہ رکھیں۔ زیادہ دودھ پیٹ بھر دیتا ہے اور فولاد والی غذا کی جگہ لے لیتا ہے۔"]],
+ [["Ill and off food","بیمار ہے اور کھانا نہیں کھاتا"],["Keep feeding during the illness, not only after it. Small amounts often, extra breastfeeds, and plenty of fluids. Offer one extra meal a day for two weeks after recovery.","بیماری کے دوران بھی کھلاتی رہیں، صرف بعد میں نہیں۔ تھوڑا تھوڑا بار بار، زیادہ دودھ، اور کافی پانی۔ صحت یابی کے بعد دو ہفتے تک ایک اضافی کھانا دیں۔"]],
+ [["Losing weight","وزن گر رہا ہے"],["This one needs more than a kitchen answer. Get the child weighed at the clinic or by your Lady Health Worker so you can see the trend rather than guess.","یہ بات صرف رسوئی سے حل نہیں ہوتی۔ کلینک یا لیڈی ہیلتھ ورکر سے وزن کروائیں تاکہ اندازے کے بجائے فرق نظر آئے۔"]]];
+const SCHOOL=[[["Before school","اسکول سے پہلے"],["Never send a child out on tea alone. Dahi with roti and gur, doodh dalia, or an egg — any of the three takes five minutes.","بچے کو صرف چائے پر باہر نہ بھیجیں۔ دہی روٹی گڑ، دودھ دلیہ، یا انڈا — تینوں میں پانچ منٹ لگتے ہیں۔"]],
+ [["The lunchbox","لنچ باکس"],["Besan cheela folded flat, roti with gur and a little ghee, boiled egg, or chana chaat without chilli. All stay good for hours.","تہہ کیا بیسن کا چیلا، گڑ اور تھوڑے گھی والی روٹی، ابلا انڈا، یا بغیر مرچ چنا چاٹ۔ سب گھنٹوں ٹھیک رہتے ہیں۔"]],
+ [["Water, not bottles","پانی، بوتل نہیں"],["Send water from home. The money for one fizzy drink buys six eggs in most weeks.","گھر کا پانی بھیجیں۔ ایک بوتل کے پیسوں میں اکثر چھ انڈے آ جاتے ہیں۔"]],
+ [["After school","اسکول کے بعد"],["Chana chaat, banana, gur with peanuts — something real before homework, so dinner is not the only proper meal.","چنا چاٹ، کیلا، گڑ مونگ پھلی — ہوم ورک سے پہلے کچھ اصل غذا، تاکہ رات کا کھانا واحد ڈھنگ کا کھانا نہ ہو۔"]]];
+/* feature 22 + 24 + feature map */
+const LEARN=[
+ {ic:"🤰",t:["Eating in pregnancy","حمل میں خوراک"],s:["One extra small meal, not two plates","ایک اضافی چھوٹا کھانا، دو پلیٹیں نہیں"],
+  p:[["You do not need to eat for two — one extra small meal a day is closer to the truth.","’دو کے لیے کھانا‘ ضروری نہیں — دن میں ایک اضافی چھوٹا کھانا کافی ہے۔"],
+     ["Put something iron-rich on the plate every day: daal, greens, gur, meat or eggs.","روز پلیٹ میں فولاد والی چیز رکھیں: دال، ساگ، گڑ، گوشت یا انڈا۔"],
+     ["Keep tea one hour away from meals; it blocks the iron you just ate.","چائے کھانے سے ایک گھنٹہ الگ رکھیں؛ یہ فولاد روکتی ہے۔"],
+     ["Take the iron and folic acid your clinic gives you, even on good days.","کلینک کی فولاد اور فولک ایسڈ کی گولی باقاعدگی سے لیں۔"]]},
+ {ic:"🍼",t:["First six months","پہلے چھ ماہ"],s:["Only mother's milk","صرف ماں کا دودھ"],
+  p:[["No water, no ghutti, no tea before six months.","چھ ماہ سے پہلے نہ پانی، نہ گھٹی، نہ چائے۔"],
+     ["Feed whenever the baby asks, day and night — more feeding makes more milk.","بچہ جب مانگے پلائیں، دن رات — زیادہ پلانے سے زیادہ دودھ بنتا ہے۔"],
+     ["Six or more wet nappies a day usually means enough is coming.","دن میں چھ یا زیادہ گیلے لنگوٹ عموماً کافی دودھ کی نشانی ہیں۔"],
+     ["Eat and drink properly yourself. A hungry mother makes milk harder.","اپنا کھانا پینا پورا رکھیں۔ بھوکی ماں کے لیے دودھ بنانا مشکل ہے۔"]]},
+ {ic:"🥄",t:["Starting solid food","اوپری غذا کا آغاز"],s:["At six months, thick not thin","چھ ماہ پر، گاڑھی غذا"],
+  p:[["Start at six months while still breastfeeding.","چھ ماہ پر شروع کریں، دودھ پلانا جاری رکھیں۔"],
+     ["Two or three spoons twice a day at first, then build up.","پہلے دن میں دو بار، دو تین چمچ، پھر بڑھائیں۔"],
+     ["One new food at a time, watched for two or three days.","ایک وقت میں ایک نئی چیز، دو تین دن دھیان رکھیں۔"],
+     ["No salt, sugar, chilli or honey before one year.","ایک سال سے پہلے نمک، چینی، مرچ اور شہد نہیں۔"]]},
+ {ic:"🧼",t:["Clean hands, clean food","صاف ہاتھ، صاف کھانا"],s:["The cheapest medicine there is","سب سے سستی دوا"],
+  p:[["Soap and water before cooking, before feeding, and after the toilet.","پکانے، کھلانے سے پہلے اور بیت الخلا کے بعد صابن سے ہاتھ دھوئیں۔"],
+     ["Cover cooked food; two hours in warm weather is the limit.","پکا کھانا ڈھانپیں؛ گرمی میں دو گھنٹے کی حد ہے۔"],
+     ["Reheat leftovers until they steam right through, and only once.","بچا کھانا بھاپ آنے تک گرم کریں، صرف ایک بار۔"],
+     ["Boil drinking water if you are unsure of the source.","پانی پر شک ہو تو ابال لیں۔"]]},
+ {ic:"🫙",t:["Saving food and money","کھانا اور پیسہ بچانا"],s:["Cook once, eat twice","ایک بار پکائیں، دو بار کھائیں"],
+  p:[["Make a bigger pot of daal and use it again tomorrow.","دال زیادہ بنائیں اور کل دوبارہ استعمال کریں۔"],
+     ["Buy the vegetable that is in season — cheapest and freshest.","موسمی سبزی خریدیں — سستی اور تازہ۔"],
+     ["Soak chana and daal overnight to save gas.","چنے اور دال رات کو بھگو دیں، گیس بچے گی۔"],
+     ["Yesterday's rice plus a handful of daal is today's khichri.","کل کے چاول اور ایک مٹھی دال آج کی کھچڑی۔"]]},
+ {ic:"🙅",t:["When a child says no","جب بچہ انکار کرے"],s:["Patience, not pressure","صبر، زبردستی نہیں"],
+  p:[["Small portions, offered again another day.","تھوڑی مقدار، اگلے دن پھر پیش کریں۔"],
+     ["Let them feed themselves, even if it is messy.","خود کھانے دیں، چاہے گندگی ہو۔"],
+     ["Never force-feed or threaten; it makes refusing stronger.","زبردستی یا ڈر نہیں؛ اس سے انکار بڑھتا ہے۔"],
+     ["Cut biscuits between meals so real hunger arrives.","کھانوں کے درمیان بسکٹ کم کریں تاکہ اصل بھوک لگے۔"]]},
+ {alert:1,ic:"🚨",t:["Go and get help today","آج ہی مدد لیں"],s:["These signs do not wait","یہ نشانیاں انتظار نہیں کرتیں"],
+  p:[["Mother: bleeding, severe stomach pain, bad headache with blurred vision, swollen face or hands, fever, or the baby moving much less than usual.","ماں: خون آنا، شدید پیٹ درد، شدید سر درد کے ساتھ دھندلی نظر، چہرے یا ہاتھوں کی سوجن، بخار، یا بچے کی حرکت بہت کم۔"],
+     ["Newborn: will not feed, unusually sleepy, fast or difficult breathing, fits, or no wet nappy for many hours.","نوزائیدہ: دودھ نہ پیے، غیر معمولی نیند، تیز یا مشکل سانس، دورے، یا کئی گھنٹے لنگوٹ خشک۔"],
+     ["Child: sunken eyes, no tears, very little urine, blood in stool, or diarrhoea over two days.","بچہ: دھنسی آنکھیں، آنسو نہ آنا، پیشاب بہت کم، پاخانے میں خون، یا دو دن سے زیادہ دست۔"],
+     ["Anyone: food that smells or tastes wrong — throw it out.","کوئی بھی: کھانے کی بو یا ذائقہ بدلا ہو تو پھینک دیں۔"]]}
+];
+const FMAP=[["Mother's profile","My Family + step 1"],["Safe pregnancy dating","Step 3"],["Fetal development journey","Step 4 + Today"],
+ ["Multiple child profiles","Step 5 + My Family"],["Personalised family nutrition","Today"],["Today dashboard","Today"],
+ ["Cooking routine setup","Step 6"],["Family meal planner","Meals · Family meal"],["Individual meal adaptations","Meals · Family meal"],
+ ["My Kitchen by voice or text","Meals · My kitchen"],["Smart substitutions","Meals · Family meal"],["Mother's energy mode","Meals · Budget & strength"],
+ ["Quick meal help","Meals · Budget & strength"],["Cook within my budget","Meals · Budget & strength"],["Meal rescue","Meals · Meal rescue"],
+ ["Weekly nutrition balance","Meals · This week"],["Local market basket","Meals · Shopping"],["Family helper","Meals · Shopping"],
+ ["Food storage and leftovers","Meals · Storage"],["Child eating support","My Family"],["School-day nutrition","My Family"],
+ ["Learn","Learn"],["Ask MaaSaathi by voice or text","Ask"],["Health and safety alerts","Ask + Learn"],["Simple multilingual interface","Everywhere"]];
+function vLearn(){
+ const i=S.lang==="ur"?1:0;
+ $("#body").innerHTML=`<div class="lgrid">`+LEARN.map((c,n)=>`
+  <button class="learn ${c.alert?"alert":""}" data-l="${n}" aria-expanded="false">
+   <span class="ic">${c.ic}</span><span class="lt">${c.t[i]}</span><span class="ls">${c.s[i]}</span>
+   <span class="lb"><ul>${c.p.map(x=>`<li>${x[i]}</li>`).join("")}</ul></span></button>`).join("")
+  +`</div>
+  <h3 class="sec">${B("Every feature, and where it lives","ہر خصوصیت اور اس کی جگہ")}</h3>
+  <ol class="fmap">${FMAP.map(f=>`<li><b>${f[0]}</b><span>${f[1]}</span></li>`).join("")}</ol>
+  <p class="safety">${T("safety")}</p>`;
+}
+/* feature 23 + 24 */
+const QA=[
+ {k:["nausea","vomit","sick","matli","ulti","متلی"],a:["Eat small amounts often instead of one big plate, and keep something dry beside your bed for before you get up. Cold plain food smells less — dahi, banana, cold roti. Sip water through the day. If you cannot keep any liquid down for a whole day, or your urine turns very dark, see a doctor today.","ایک بڑی پلیٹ کے بجائے تھوڑا تھوڑا بار بار کھائیں، اور اٹھنے سے پہلے کھانے کے لیے بستر کے پاس خشک چیز رکھیں۔ ٹھنڈے سادہ کھانے کی بو کم ہوتی ہے۔ دن بھر گھونٹ گھونٹ پانی پیئیں۔ اگر پورا دن کچھ نہ ٹھہرے یا پیشاب گہرا ہو تو آج ہی ڈاکٹر کو دکھائیں۔"]},
+ {k:["iron","khoon","anemia","anaemia","weak","فولاد"],a:["Daal, palak, gur, chana, meat and eggs all carry iron. Lemon with the meal helps you absorb it; tea straight after blocks it. Keep taking the clinic's iron tablet. Very breathless, dizzy, or pale inner eyelids means ask for a blood test.","دال، پالک، گڑ، چنا، گوشت اور انڈے فولاد دیتے ہیں۔ کھانے کے ساتھ لیموں جذب میں مدد دیتا ہے؛ فوراً بعد چائے روکتی ہے۔ کلینک کی گولی جاری رکھیں۔ سانس پھولے، چکر آئیں یا پلکوں کے اندر سفیدی ہو تو خون کا ٹیسٹ کروائیں۔"]},
+ {k:["brain","dimagh","smart","دماغ"],a:["The brain grows fastest from about week 24 to birth and through the first two years. The foods that build it are omega-3 fats, choline and iron: fish, egg yolk, walnut, milk, daal and greens. An egg a day and fish once or twice a week does more than any tonic sold in the bazaar.","دماغ تقریباً چوبیسویں ہفتے سے پیدائش تک اور پہلے دو سال میں سب سے تیزی سے بڑھتا ہے۔ اسے بنانے والی غذائیں اومیگا تھری، کولین اور فولاد ہیں: مچھلی، انڈے کی زردی، اخروٹ، دودھ، دال اور ساگ۔ روز ایک انڈا اور ہفتے میں ایک دو بار مچھلی بازار کے کسی ٹانک سے زیادہ فائدہ دیتی ہے۔"]},
+ {k:["milk","doodh","breastfeed","feed","دودھ"],a:["Milk is made by demand — the more the baby feeds, the more comes. Feed on both sides day and night, and check the baby is latching deeply. Eat and drink properly yourself. Fewer than six wet nappies a day, or no weight gain, means see your Lady Health Worker.","دودھ طلب سے بنتا ہے — بچہ جتنا پیے گا اتنا بنے گا۔ دونوں طرف سے دن رات پلائیں، اور دیکھیں کہ منہ گہرائی سے لگ رہا ہے۔ اپنا کھانا پینا پورا رکھیں۔ چھ سے کم گیلے لنگوٹ یا وزن نہ بڑھنا ہو تو لیڈی ہیلتھ ورکر سے ملیں۔"]},
+ {k:["six month","6 month","solid","weaning","اوپری"],a:["At six months start thick mashed food alongside breast milk — khichri, mashed daal with rice, mashed banana, well-cooked egg. Two or three spoons twice a day to begin. Thick, not watery. No salt, sugar, chilli or honey before one year.","چھ ماہ پر ماں کے دودھ کے ساتھ گاڑھی میش غذا شروع کریں — کھچڑی، دال چاول، میش کیا کیلا، اچھی پکی انڈے کی زردی۔ دن میں دو بار، دو تین چمچ سے شروع کریں۔ گاڑھی ہو، پتلی نہیں۔ ایک سال سے پہلے نمک، چینی، مرچ اور شہد نہیں۔"]},
+ {k:["not eating","refuse","nakhra","picky","نخرے"],a:["Offer a small portion, sit and eat together, and take it away without anger. Try the same food again another day — children often need many tries. Stop biscuits and sweet drinks between meals. Losing weight month by month means get the weight checked.","تھوڑی مقدار دیں، ساتھ بیٹھ کر کھائیں، انکار پر غصے کے بغیر ہٹا دیں۔ وہی چیز کسی اور دن پھر دیں۔ کھانوں کے درمیان بسکٹ اور میٹھے مشروب بند کریں۔ مہینہ بہ مہینہ وزن گرے تو وزن چیک کروائیں۔"]},
+ {k:["avoid","parhez","unsafe","پرہیز"],a:["In pregnancy avoid raw or half-cooked eggs and meat, unboiled milk, cut fruit left in the open, and very salty dried fish. Keep tea and coffee light. Do not take herbal or strong medicines without asking your doctor.","حمل میں کچے یا ادھ پکے انڈے اور گوشت، بغیر ابلا دودھ، کھلے میں کٹا پھل، اور بہت نمکین سوکھی مچھلی سے پرہیز کریں۔ چائے اور کافی ہلکی رکھیں۔ ڈاکٹر سے پوچھے بغیر جڑی بوٹی یا تیز دوا نہ لیں۔"]},
+ {k:["budget","paisa","cheap","sasta","بجٹ"],a:["The cheapest strong foods are daal, chana, seasonal sabzi, eggs, gur and dahi. Buy what is in season, cook one big pot and use it twice, and soak pulses overnight to save gas. One egg or a bowl of daal a day does more than any expensive packet.","سب سے سستی طاقتور چیزیں دال، چنا، موسمی سبزی، انڈے، گڑ اور دہی ہیں۔ موسمی خریدیں، ایک بڑی دیگچی پکا کر دو بار استعمال کریں، دالیں رات کو بھگو دیں۔ روز ایک انڈا یا ایک پیالی دال کسی مہنگے پیکٹ سے بہتر ہے۔"]},
+ {k:["constipation","qabz","قبض"],a:["Chana, whole daal, seasonal vegetables, papaya and plenty of water usually help, along with a little walking. Do not take laxatives on your own in pregnancy — ask your doctor first, especially if there is pain or bleeding.","چنا، ثابت دال، موسمی سبزیاں، پپیتا اور کافی پانی مدد دیتے ہیں، ساتھ تھوڑی چہل قدمی۔ حمل میں اپنی مرضی سے قبض کی دوا نہ لیں — پہلے ڈاکٹر سے پوچھیں۔"]},
+ {k:["diarrhoea","diarrhea","dast","ors","دست"],a:["Keep breastfeeding and give ORS after every loose stool, in small sips. Zinc for ten to fourteen days is usually advised — ask your health worker. Sunken eyes, no tears, very little urine, blood in the stool, or more than two days means go now.","دودھ پلانا جاری رکھیں اور ہر پتلے پاخانے کے بعد تھوڑا تھوڑا او آر ایس دیں۔ عموماً دس سے چودہ دن زنک دیا جاتا ہے۔ دھنسی آنکھیں، آنسو نہ آنا، کم پیشاب، پاخانے میں خون یا دو دن سے زیادہ ہو تو فوراً جائیں۔"]},
+ {k:["tired","thak","energy","ہمت"],a:["On a tired day cook one pot only — khichri, or daal with yesterday's rice. Keep dahi, banana, gur and chana in the house for the days when the stove feels too far. Rest when the baby rests, and ask someone at home for one specific job.","تھکن والے دن صرف ایک دیگچی پکائیں — کھچڑی، یا کل کے چاول کے ساتھ دال۔ گھر میں دہی، کیلا، گڑ اور چنے رکھیں۔ بچہ سوئے تو آرام کریں، اور گھر والوں سے ایک مخصوص کام کہیں۔"]},
+ {k:["weight","wazan","dubla","وزن"],a:["Add energy without adding bulk: a spoon of ghee in the child's food, milk instead of water in sooji, mashed banana, and one extra small meal between the main ones. Keep feeding during illness. Get the child weighed at the clinic so you see the trend.","مقدار بڑھائے بغیر توانائی بڑھائیں: بچے کے کھانے میں ایک چمچ گھی، سوجی میں دودھ، میش کیا کیلا، اور ایک اضافی چھوٹا کھانا۔ بیماری میں بھی کھلاتی رہیں۔ کلینک میں وزن کروائیں۔"]}
+];
+const RED=["bleeding","blood","khoon","fits","convulsion","not breathing","unconscious","behosh","severe pain","خون","دورے"];
+const REDM=["This one is not for me to answer from the kitchen. What you are describing needs to be seen today — go to your nearest doctor, BHU or hospital, or call your Lady Health Worker now. Take someone with you if you can.",
+ "یہ بات رسوئی سے حل ہونے والی نہیں۔ جو آپ بتا رہی ہیں اسے آج ہی دیکھنا ضروری ہے — قریبی ڈاکٹر، بی ایچ یو یا اسپتال جائیں، یا ابھی لیڈی ہیلتھ ورکر کو بلائیں۔"];
+const FB=["I did not quite catch that. Try asking about iron, nausea, brain development, breastfeeding, starting solid food at six months, a child who refuses food, loose motions, or cooking on a small budget.",
+ "یہ بات پوری سمجھ نہیں آئی۔ فولاد، متلی، دماغی نشوونما، دودھ پلانے، چھ ماہ پر اوپری غذا، کھانے سے انکار، دست، یا کم بجٹ کے کھانے کے بارے میں پوچھیں۔"];
+function vAsk(){
+ const i=S.lang==="ur"?1:0;
+ const sug=S.lang==="ur"?["بچے کے دماغ کے لیے کیا کھاؤں؟","صبح متلی ہوتی ہے","فولاد کیسے بڑھاؤں؟","بچہ کھانا نہیں کھاتا","کم بجٹ میں کھانا"]
+  :["What should I eat for the baby's brain?","I feel sick in the mornings","How do I get more iron?","My child refuses food","Cooking on a small budget"];
+ $("#body").innerHTML=`<div id="chat"></div>
+  <div class="pills">${sug.map(q=>`<button class="pill" data-q="${q}">${q}</button>`).join("")}</div>
+  <div class="row nowrap"><input type="text" id="ain" placeholder="${B("Write here…","یہاں لکھیں…")}">
+   <button class="mic" data-act="amic">🎙</button></div>
+  <button class="btn big" data-act="ask">${B("Ask nani jaan","نانی جان سے پوچھیں")}</button>
+  <p class="safety">${T("safety")}</p>`;
+ if(!S.chat.length)S.chat.push({w:"her",t:B("Ask me, beta. If it is about food, feeding or the children's eating, I can help.","پوچھو بیٹا۔ کھانے، دودھ پلانے یا بچوں کی خوراک کی بات ہو تو میں بتا دوں گی۔")});
+ chat();
+ $("#ain").addEventListener("keydown",e=>{if(e.key==="Enter"){ask($("#ain").value);$("#ain").value="";}});
+}
+function chat(){
+ const el=$("#chat");if(!el)return;
+ el.innerHTML=S.chat.map((m,n)=>`<div class="bub ${m.w}">${m.t}${m.w==="her"?`<br><button class="link" data-sp="${n}">🔊 ${T("read")}</button>`:""}</div>`).join("");
+ $("#body").scrollTop=$("#body").scrollHeight;
+}
+function ask(q){
+ q=(q||"").trim();if(!q)return;
+ S.chat.push({w:"me",t:q});
+ const l=q.toLowerCase(),i=S.lang==="ur"?1:0;
+ const hit=QA.find(a=>a.k.some(k=>l.includes(k)));
+ S.chat.push({w:"her",t:RED.some(r=>l.includes(r))?REDM[i]:(hit?hit.a[i]:FB[i])});
+ chat();SCENE.bloom();
+}
+/* voice in and out */
+function listen(btn){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){alert(B("Voice is not available on this device. Please type instead.","اس فون پر آواز دستیاب نہیں۔ براہ کرم لکھ کر بتائیں۔"));return null;}
+ const r=new SR();r.lang=S.lang==="ur"?"ur-PK":"en-IN";r.interimResults=false;
+ btn&&btn.classList.add("live");
+ r.onend=r.onerror=()=>btn&&btn.classList.remove("live");
+ try{r.start()}catch(e){}
+ return r;
+}
+function speak(t){if(!window.speechSynthesis)return;
+ const u=new SpeechSynthesisUtterance(String(t).replace(/<[^>]+>/g,""));
+ u.lang=S.lang==="ur"?"ur-PK":"en-IN";u.rate=.92;speechSynthesis.cancel();speechSynthesis.speak(u);}
+
+/* =====================  one delegated click handler  ===================== */
+document.addEventListener("click",e=>{
+ const el=e.target.closest("[data-go],[data-set],[data-tog],[data-multi],[data-lang],[data-act],[data-v],[data-t],[data-meal],[data-l],[data-q],[data-sp],[data-rm],[data-ad],[data-resc],[data-child],[data-rmkid],[data-bk]");
+ if(!el)return;
+ const d=el.dataset;
+
+ if(d.go!==undefined){
+  const n=+d.go;
+  if(n>=STEPS.length){S.done=1;save();plan();enter();return;}
+  S.step=Math.max(0,n);save();drawStep();return;}
+ if(d.lang){S.lang=d.lang;save();if(S.done){renderChrome();go(S.view);}else drawStep();return;}
+ if(d.set){S[d.set]=isNaN(+d.v)?d.v:+d.v;save();
+  if(!S.done)drawStep();else if(S.view==="meals"){const cur=$(".tabs button[aria-selected=true]");const k=cur?cur.dataset.t:"plan";vMeals();tab(k);}else go(S.view);
+  SCENE.setStage(stage().prog);return;}
+ if(d.tog!==undefined){S[d.tog]=S[d.tog]?0:1;el.setAttribute("aria-pressed",!!S[d.tog]);save();return;}
+ if(d.multi){const i=S.cookStyle.indexOf(d.multi);i<0?S.cookStyle.push(d.multi):S.cookStyle.splice(i,1);
+  el.setAttribute("aria-pressed",S.cookStyle.includes(d.multi));save();return;}
+ if(d.v!==undefined&&el.dataset.v&&!d.set){/* handled above */}
+ if(d.t){tab(d.t);return;}
+ if(d.meal){S.focusMeal=d.meal;save();
+  if(S.view!=="meals"){go("meals");}else{tPlan();}
+  tab("plan");SCENE.bloom();return;}
+ if(d.l!==undefined){const o=el.getAttribute("aria-expanded")==="true";
+  $$("[data-l]").forEach(x=>x.setAttribute("aria-expanded","false"));el.setAttribute("aria-expanded",!o);return;}
+ if(d.q){ask(d.q);return;}
+ if(d.sp!==undefined){speak(S.chat[+d.sp].t);return;}
+ if(d.rm){S.pantry=S.pantry.filter(x=>x!==d.rm);pantry();save();return;}
+ if(d.ad){addP(d.ad);return;}
+ if(d.resc!==undefined){const i=S.lang==="ur"?1:0,x=RESC[+d.resc];
+  $("#ro").innerHTML=`<div class="nani"><span class="av">👵</span><p><b>${x[0][i]}</b>${x[1][i]}</p></div>`;SCENE.bloom();return;}
+ if(d.child!==undefined){const i=S.lang==="ur"?1:0,x=CHILD[+d.child];
+  $("#chout").innerHTML=`<div class="nani"><span class="av">👵</span><p><b>${x[0][i]}</b>${x[1][i]}</p></div>`;return;}
+ if(d.rmkid!==undefined){S.kids.splice(+d.rmkid,1);save();
+  const b=$("#kidbox");if(b)b.innerHTML=kidList();return;}
+ if(d.bk!==undefined){S.basket.splice(+d.bk,1);save();tBasket();tab("basket");return;}
+
+ switch(d.act){
+  case "addkid":{const a=+$("#kAge").value;if(isNaN(a)||$("#kAge").value==="")return;
+   S.kids.push({age:a,unit:$("#kUnit").value});save();
+   const b=$("#kidbox");if(b)b.innerHTML=kidList();$("#kAge").value="";SCENE.bloom();break;}
+  case "reroll":plan();go("today");SCENE.bloom();break;
+  case "tolimits":go("meals");tab("limits");break;
+  case "redate":S.done=0;S.step=2;save();$("#app").classList.remove("on");$("#onb").classList.remove("gone");onb();break;
+  case "cook":cook();break;
+  case "pmic":{const r=listen(el);if(r)r.onresult=ev=>addP(ev.results[0][0].transcript);break;}
+  case "amic":{const r=listen(el);if(r)r.onresult=ev=>ask(ev.results[0][0].transcript);break;}
+  case "ask":ask($("#ain").value);$("#ain").value="";break;
+  case "addbk":{const v=$("#bin").value.trim();if(v){S.basket.push(v);save();tBasket();tab("basket");}break;}
+  case "share":{const txt=encodeURIComponent((S.lang==="ur"?"سامان کی فہرست:\n":"Shopping list:\n")+S.basket.map(x=>"• "+x).join("\n"));
+   window.open("https://wa.me/?text="+txt,"_blank");break;}
+  case "quality":S.quality=S.quality?0:1;el.setAttribute("aria-pressed",!!S.quality);SCENE.setQuality(S.quality);save();break;
+ }
+});
+document.addEventListener("input",e=>{
+ const el=e.target,d=el.dataset;
+ if(d.r){S[d.r]=+el.value;save();
+  const hh=$("#hh");if(hh&&d.r==="house")hh.textContent=S.house;
+  const wv=$("#wvv");if(wv&&d.r==="week")wv.textContent=S.week;
+  refreshStage();return;}
+ if(d.f){S[d.f]=el.value;save();return;}
+ if(d.d){
+  const v=new Date(el.value);if(isNaN(v))return;
+  const now=new Date();
+  if(d.d==="lmp")S.week=Math.max(1,Math.min(42,Math.round((now-v)/6048e5)));
+  else S.week=Math.max(1,Math.min(42,40-Math.round((v-now)/6048e5)));
+  save();refreshStage();return;}
+});
+document.addEventListener("change",e=>{
+ const el=e.target;if(el.id==="nav-v")return;
+ if(el.closest("#nav"))return;
+});
+document.addEventListener("click",e=>{const b=e.target.closest("#nav button");if(b)go(b.dataset.v);});
+
+function start(){
+ load();
+ $("#lbtn").onclick=()=>{S.lang=S.lang==="ur"?"en":"ur";save();
+  if(S.done){renderChrome();go(S.view);}else drawStep();};
+ $("#qbtn").setAttribute("aria-pressed",!!S.quality);
+ SCENE.setQuality(S.quality);
+ if(S.done){plan();enter();}else{onb();}
+ setTimeout(()=>{window.__loadOK=true;$("#boot").classList.add("gone");},700);
+}
+
+</script>
+<script>
+/* Chulha — a clay hearth: pots fill, embers breathe, steam rises */
+const SCENE=(function(){
+const cv=document.getElementById('world');
+const rn=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+rn.setSize(innerWidth,innerHeight);rn.outputEncoding=THREE.sRGBEncoding;
+rn.toneMapping=THREE.ACESFilmicToneMapping;rn.toneMappingExposure=1.1;
+const sc=new THREE.Scene();sc.background=new THREE.Color(0x140D0A);sc.fog=new THREE.FogExp2(0x140D0A,.042);
+const cam=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,120);
+sc.add(new THREE.AmbientLight(0x4A2A1C,.9));
+const fire=new THREE.PointLight(0xFF8A2E,3.2,26,2);fire.position.set(0,-.3,0);sc.add(fire);
+const rim=new THREE.PointLight(0x7A4A8A,.9,30,2);rim.position.set(-6,3,-4);sc.add(rim);
+const clay=new THREE.MeshStandardMaterial({color:0x6B4230,roughness:.92});
+/* the chulha body */
+const body=new THREE.Mesh(new THREE.CylinderGeometry(2.1,2.5,1.5,32,1,true),clay);
+body.position.y=-1.4;sc.add(body);
+const top=new THREE.Mesh(new THREE.TorusGeometry(2.1,.22,12,40),clay);
+top.rotation.x=Math.PI/2;top.position.y=-.66;sc.add(top);
+const mouth=new THREE.Mesh(new THREE.BoxGeometry(1.1,.8,.4),new THREE.MeshStandardMaterial({color:0x2A160E,roughness:1}));
+mouth.position.set(0,-1.6,2.35);sc.add(mouth);
+/* embers inside */
+const emb=[];
+for(let i=0;i<26;i++){const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.13+Math.random()*.1,0),
+ new THREE.MeshStandardMaterial({color:0x8A2E10,emissive:0xFF6A1E,emissiveIntensity:1,roughness:.9}));
+ const a=Math.random()*7,r=Math.random()*1.5;
+ m.position.set(Math.cos(a)*r,-1.15+Math.random()*.2,Math.sin(a)*r);
+ m.rotation.set(Math.random()*3,Math.random()*3,Math.random()*3);sc.add(m);emb.push(m);}
+/* the big family pot */
+const pot=new THREE.Group();pot.position.y=-.1;sc.add(pot);
+const potBody=new THREE.Mesh(new THREE.SphereGeometry(1.15,32,20,0,7,0,Math.PI*.62),
+ new THREE.MeshStandardMaterial({color:0x3A2A22,roughness:.5,metalness:.35,side:THREE.DoubleSide}));
+potBody.rotation.x=Math.PI;pot.add(potBody);
+const potRim=new THREE.Mesh(new THREE.TorusGeometry(1.05,.07,10,40),
+ new THREE.MeshStandardMaterial({color:0xC98F4B,roughness:.35,metalness:.6}));
+potRim.rotation.x=Math.PI/2;potRim.position.y=.32;pot.add(potRim);
+const stew=new THREE.Mesh(new THREE.CircleGeometry(1.0,40),
+ new THREE.MeshStandardMaterial({color:0xD98C3A,roughness:.6,emissive:0x8A4A12,emissiveIntensity:.3}));
+stew.rotation.x=-Math.PI/2;stew.position.y=.26;pot.add(stew);
+/* nine small pots around the hearth = the nine months */
+const small=[];
+for(let i=0;i<9;i++){
+ const g=new THREE.Group();const a=(i/9)*Math.PI*2+.3,r=3.9;
+ g.position.set(Math.cos(a)*r,-1.1,Math.sin(a)*r);
+ const b=new THREE.Mesh(new THREE.SphereGeometry(.42,20,14,0,7,0,Math.PI*.6),
+  new THREE.MeshStandardMaterial({color:0x5C3A2A,roughness:.75}));
+ b.rotation.x=Math.PI;g.add(b);
+ const f=new THREE.Mesh(new THREE.CircleGeometry(.36,24),
+  new THREE.MeshStandardMaterial({color:0xF0913C,emissive:0xF0913C,emissiveIntensity:.2,roughness:.6}));
+ f.rotation.x=-Math.PI/2;f.position.y=.1;g.add(f);
+ g.userData={f,i,a};sc.add(g);small.push(g);}
+/* roti stack */
+const roti=new THREE.Group();roti.position.set(3.1,-1.15,1.6);sc.add(roti);
+for(let i=0;i<5;i++){const r=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.05,24),
+ new THREE.MeshStandardMaterial({color:0xD9B27C,roughness:.85}));
+ r.position.y=i*.06;r.rotation.y=i*.6;roti.add(r);}
+/* steam */
+const sN=520,sp=new Float32Array(sN*3),sv=[];
+for(let i=0;i<sN;i++){const a=Math.random()*7,r=Math.random()*.9;
+ sp[i*3]=Math.cos(a)*r;sp[i*3+1]=.3+Math.random()*4;sp[i*3+2]=Math.sin(a)*r;sv.push(.006+Math.random()*.016);}
+const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(sp,3));
+const steam=new THREE.Points(sg,new THREE.PointsMaterial({color:0xF5E8D8,size:.13,transparent:true,
+ opacity:.3,depthWrite:false,blending:THREE.AdditiveBlending}));sc.add(steam);
+/* sparks */
+const kN=160,kp=new Float32Array(kN*3),kv=[];
+for(let i=0;i<kN;i++){kp[i*3]=kp[i*3+1]=kp[i*3+2]=0;kv.push(new THREE.Vector3());}
+const kg=new THREE.BufferGeometry();kg.setAttribute('position',new THREE.BufferAttribute(kp,3));
+const km=new THREE.PointsMaterial({color:0xFFBC78,size:.1,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending});
+sc.add(new THREE.Points(kg,km));let sparkL=0;
+const SH={onboard:[0,1.6,10.5],analysis:[3.6,1.2,7],today:[1.8,2.2,8.6],meals:[5.6,1.4,6.4],family:[0,5.4,7.6],learn:[-5.6,1.6,7.4],ask:[.6,.6,4.8]};
+let tg=new THREE.Vector3(...SH.onboard),cu=tg.clone(),lk=new THREE.Vector3(0,-.2,0),pr=.5,bu=0;
+const ck=new THREE.Clock();
+function loop(){requestAnimationFrame(loop);const t=ck.getElapsedTime();
+ const fl=.85+Math.sin(t*7.3)*.09+Math.sin(t*13.7)*.06;
+ fire.intensity=(2.6+bu*2.2)*fl;
+ emb.forEach((m,i)=>{m.material.emissiveIntensity=.7+Math.sin(t*3+i)*.45;
+  m.position.y=-1.15+Math.abs(Math.sin(t*1.5+i))*.08;m.rotation.y+=.004;});
+ stew.material.emissiveIntensity=.25+Math.sin(t*2)*.1+bu*.5;
+ stew.position.y=.26+Math.sin(t*1.7)*.012;
+ pot.rotation.y=Math.sin(t*.2)*.06;
+ small.forEach(g=>{const on=g.userData.i<pr*9;
+  g.userData.f.material.emissiveIntensity=on?.45+Math.sin(t*2+g.userData.i)*.2:.03;
+  g.userData.f.material.color.setHex(on?0xF0913C:0x4A3226);
+  g.position.y=-1.1+(on?Math.sin(t*1.2+g.userData.i)*.05:0);
+  g.scale.setScalar(on?1.1:.85);});
+ roti.rotation.y=Math.sin(t*.3)*.1;
+ const sa=steam.geometry.attributes.position.array;
+ for(let i=0;i<sN;i++){sa[i*3+1]+=sv[i]*(1+bu);
+  sa[i*3]+=Math.sin(t*.8+i)*.004;sa[i*3+2]+=Math.cos(t*.7+i)*.003;
+  if(sa[i*3+1]>5.5){const a=Math.random()*7,r=Math.random()*.9;
+   sa[i*3]=Math.cos(a)*r;sa[i*3+1]=.3;sa[i*3+2]=Math.sin(a)*r;}}
+ steam.geometry.attributes.position.needsUpdate=true;
+ if(sparkL>0){sparkL-=.014;
+  for(let i=0;i<kN;i++){kp[i*3]+=kv[i].x;kp[i*3+1]+=kv[i].y;kp[i*3+2]+=kv[i].z;kv[i].y-=.0015;}
+  kg.attributes.position.needsUpdate=true;km.opacity=Math.max(0,sparkL);}
+ bu*=.94;
+ cu.lerp(tg,.035);cam.position.copy(cu);cam.lookAt(lk);rn.render(sc,cam);}
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();rn.setSize(innerWidth,innerHeight);});
+loop();
+return{focus(v){const s=SH[v]||SH.today;tg.set(s[0],s[1],s[2]);},setStage(p){pr=p;},
+ bloom(){bu=1;sparkL=1;for(let i=0;i<kN;i++){kp[i*3]=0;kp[i*3+1]=-.6;kp[i*3+2]=0;
+  kv[i].set((Math.random()-.5)*.6,Math.random()*.9+.2,(Math.random()-.5)*.6).multiplyScalar(.09);}
+  kg.attributes.position.needsUpdate=true;},
+ setQuality(q){rn.setPixelRatio(Math.min(devicePixelRatio,q?3:1.5));}};
+})();
+start();
+
+</script>
+</body></html>
